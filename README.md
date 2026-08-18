@@ -1,4 +1,4 @@
-# velofreundliches-wetzikon-design-tokens
+# velofreundliches-wetzikon-design-system
 
 Canonical design tokens (colors, spacing, type scale, radii, shadows, motion) for the
 **velofreundliches Wetzikon** projects. This repo is the single source of truth — consuming
@@ -6,7 +6,7 @@ repos vendor a copy rather than depending on this repo at build/deploy time.
 
 Consumers today:
 
-- **[VeloWetzikon_Contao](../VeloWetzikon_Contao)** — the public Contao CMS site
+- **[velofreundliches-wetzikon-contao](https://github.com/thomas-schager/velofreundliches-wetzikon-contao)** — the public Contao CMS site
   (`files/themes/velo/css/colors_and_type.css`) and the standalone VeloMelder feedback tool
   (`public/additions/velo-melder.html`, local `--vw-*`-prefixed mirror of the same values).
 - The backend/admin app (Symfony/Laravel) — not yet created.
