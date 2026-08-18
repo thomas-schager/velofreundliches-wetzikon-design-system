@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design Tokens — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/* This page's own presentation only -- not tokens themselves. All colors/spacing/type below
+   are read live from ../tokens.css via var(--...), never hardcoded, so this page can never
+   silently drift from the canonical file it's documenting. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: var(--tracking-tight); }
+
+.sg-wrap { display: flex; min-height: 100vh; }
+.sg-sidebar {
+  width: 224px; flex-shrink: 0;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  overflow-y: auto; background: #0d0d0d;
+  padding: 0 0 32px; z-index: 200;
+  scrollbar-width: thin; scrollbar-color: #333 transparent;
+}
+.sg-sidebar__head { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sg-sidebar__title { font: 700 14px var(--font-display); color: #fff; display: block; }
+.sg-sidebar__sub   { font: 400 11px var(--font-body); color: rgba(255,255,255,0.35); margin-top: 2px; display: block; }
+.sg-nav-group { margin-bottom: 2px; }
+.sg-nav-section { padding: 14px 20px 4px; font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+.sg-nav a { display: block; padding: 5px 20px 5px 28px; font: 400 12px var(--font-body); color: rgba(255,255,255,0.55); text-decoration: none; transition: color 120ms, background 120ms; border-left: 2px solid transparent; }
+.sg-nav a:hover, .sg-nav a.is-current { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--color-primary); }
+.sg-nav a.sg-nav-crosslink { color: var(--color-primary); font-weight: 500; }
+
+.sg-main { margin-left: 224px; flex: 1; max-width: 1200px; }
+.sg-section { padding: 48px 48px 56px; border-bottom: 1px solid var(--color-border); }
+.sg-section:last-child { border-bottom: none; }
+.sg-section__title { font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 12px; margin-bottom: 28px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; }
+.sg-section__title span { font: 400 11px var(--font-body); text-transform: none; letter-spacing: 0; color: var(--color-border-strong); font-family: monospace; }
+.sg-h { font: 600 22px/1.2 var(--font-display); margin: 0 0 28px; }
+.sg-intro { font: 400 15px/1.6 var(--font-body); color: var(--color-text-muted); max-width: 640px; margin: -8px 0 32px; }
+
+.sg-component { margin-bottom: 44px; }
+.sg-preview--white { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+
+/* Colors */
+.sg-color-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; }
+.sg-swatch { border-radius: 6px; overflow: hidden; border: 1px solid var(--color-border); }
+.sg-swatch__chip { height: 48px; }
+.sg-swatch__info { padding: 7px 9px; background: #fff; }
+.sg-swatch__var  { font: 500 10px var(--font-body); color: #000; display: block; font-family: monospace; word-break: break-all; }
+.sg-swatch__hex  { font: 400 10px var(--font-body); color: var(--color-muted); font-family: monospace; }
+.sg-color-group  { margin-bottom: 28px; }
+.sg-color-group__label { font: 600 11px var(--font-body); text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-muted); margin-bottom: 10px; }
+
+/* Type scale */
+.sg-type-rows { display: flex; flex-direction: column; }
+.sg-type-row  { display: flex; align-items: baseline; gap: 20px; padding: 10px 0; border-bottom: 1px solid var(--color-border); }
+.sg-type-meta { font: 400 11px var(--font-body); color: var(--color-muted); font-family: monospace; flex-shrink: 0; width: 160px; }
+.sg-type-sample { font-family: var(--font-display); letter-spacing: var(--tracking-tight); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+/* Spacing */
+.sg-space-rows { display: flex; flex-direction: column; gap: 8px; }
+.sg-space-row  { display: flex; align-items: center; gap: 12px; }
+.sg-space-meta { font: 400 11px var(--font-body); color: var(--color-muted); font-family: monospace; width: 120px; flex-shrink: 0; }
+.sg-space-bar  { height: 20px; background: var(--color-primary); border-radius: 2px; opacity: 1; }
+
+/* Radii */
+.sg-radius-row { display: flex; gap: 24px; flex-wrap: wrap; align-items: flex-end; }
+.sg-radius-item { text-align: center; }
+.sg-radius-box  { width: 56px; height: 56px; background: var(--color-primary-tint); border: 2px solid var(--color-primary); margin-bottom: 6px; }
+.sg-radius-label { font: 400 10px var(--font-body); color: var(--color-muted); font-family: monospace; }
+
+/* Shadows */
+.sg-shadow-row { display: flex; gap: 32px; flex-wrap: wrap; }
+.sg-shadow-box { width: 120px; height: 72px; background: #fff; border-radius: 8px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+.sg-shadow-name { font: 600 11px var(--font-body); color: var(--color-text-muted); }
+
+/* Layout / motion cards */
+.sg-layout-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.sg-layout-card { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 16px 20px; }
+.sg-layout-card__label { font: 700 10px var(--font-body); text-transform: uppercase; letter-spacing: 0.08em; color: var(--color-muted); margin-bottom: 6px; }
+.sg-layout-card__value { font: 700 22px var(--font-display); color: var(--color-primary); font-family: monospace; }
+.sg-layout-card__desc  { font: 400 11px var(--font-body); color: var(--color-text-muted); margin-top: 4px; }
+
+/* Breakpoints */
+.sg-bp-rows { display: flex; flex-direction: column; gap: 10px; }
+.sg-bp-row  { display: flex; align-items: center; gap: 14px; }
+.sg-bp-name { font: 700 11px var(--font-body); font-family: monospace; color: #000; width: 55px; flex-shrink: 0; }
+.sg-bp-track { flex: 1; height: 16px; background: var(--color-surface-2); border-radius: 3px; overflow: hidden; max-width: 500px; }
+.sg-bp-fill  { height: 100%; background: var(--color-primary); opacity: 0.35; border-radius: 3px; }
+.sg-bp-desc  { font: 400 12px var(--font-body); color: var(--color-text-muted); flex-shrink: 0; }
+
+.sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+
+<aside class="sg-sidebar">
+  <div class="sg-sidebar__head">
+    <span class="sg-sidebar__title">Design Tokens</span>
+    <span class="sg-sidebar__sub">Velofreundliches Wetzikon</span>
+  </div>
+  <nav class="sg-nav">
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Tokens</span>
+      <a href="#colors">Farben</a>
+      <a href="#typography-tokens">Typografie</a>
+      <a href="#spacing">Abstände</a>
+      <a href="#radii">Radien</a>
+      <a href="#shadows">Schatten</a>
+      <a href="#layout-tokens">Layout, Breakpoints, Motion</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Diese Doku-Seite</span>
+      <a href="contao-implementation.html" class="sg-nav-crosslink">→ Contao-Implementierung</a>
+      <a href="https://github.com/thomas-schager/velofreundliches-wetzikon-design-tokens" class="sg-nav-crosslink">→ Repo (Quelle: tokens.css)</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="sg-main">
+
+<section class="sg-section" id="intro">
+  <div class="sg-section__title">Über diese Seite <span>velofreundliches-wetzikon-design-tokens</span></div>
+  <div class="sg-h">Design Tokens</div>
+  <p class="sg-intro">
+    Diese Seite ist eine reine, portable Referenz der Design-Tokens — Farben, Typografie-Skala,
+    Abstände, Radien, Schatten, Layout- und Motion-Werte. Jeder Wert unten wird live über
+    <code>var(--…)</code> aus <code>../tokens.css</code> gelesen, nicht hier fest verdrahtet — was
+    auf dieser Seite erscheint, ist also immer exakt das, was <code>tokens.css</code> aktuell
+    enthält. Diese Datei ist die kanonische Quelle für beide Konsumenten: die öffentliche
+    Contao-Site (<code>VeloWetzikon_Contao</code>) und die künftige Backend-/Admin-Anwendung.
+    Komponenten (Buttons, Karten, Navigation, …), die auf diesen Tokens aufbauen, sind bewusst
+    <strong>nicht</strong> hier dokumentiert — dafür siehe
+    <a href="contao-implementation.html" style="color:var(--color-primary);">Contao-Implementierung</a>.
+  </p>
+</section>
+
+<!-- FARBEN -->
+<section class="sg-section" id="colors">
+  <div class="sg-section__title">Tokens <span>tokens.css · :root</span></div>
+  <div class="sg-h">Farben</div>
+
+  <div class="sg-color-group">
+    <div class="sg-color-group__label">Brand</div>
+    <div class="sg-color-grid">
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-primary)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-primary</span><span class="sg-swatch__hex">#dc3406</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-primary-hover)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-primary-hover</span><span class="sg-swatch__hex">#c32d05</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-primary-press)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-primary-press</span><span class="sg-swatch__hex">#a82704</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-primary-tint)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-primary-tint</span><span class="sg-swatch__hex">#fbe7df</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-secondary)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-secondary</span><span class="sg-swatch__hex">#000000</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-secondary-hover)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-secondary-hover</span><span class="sg-swatch__hex">#1a1a1a</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-accent)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-accent</span><span class="sg-swatch__hex">#fdd003</span></div></div>
+    </div>
+  </div>
+
+  <div class="sg-color-group">
+    <div class="sg-color-group__label">Neutrals</div>
+    <div class="sg-color-grid">
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-background); border-bottom:1px solid #eee"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-background</span><span class="sg-swatch__hex">#fafaf8</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-surface); border-bottom:1px solid #eee"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-surface</span><span class="sg-swatch__hex">#ffffff</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-surface-2)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-surface-2</span><span class="sg-swatch__hex">#f4f3ef</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-border)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-border</span><span class="sg-swatch__hex">#e8e6e0</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-border-strong)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-border-strong</span><span class="sg-swatch__hex">#cfcdc6</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-text)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-text</span><span class="sg-swatch__hex">#000000</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-text-muted)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-text-muted</span><span class="sg-swatch__hex">#5e5e5a</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-muted)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-muted</span><span class="sg-swatch__hex">#8a8a86</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-label-muted)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-label-muted</span><span class="sg-swatch__hex">#6b6b67</span></div></div>
+    </div>
+  </div>
+
+  <div class="sg-color-group">
+    <div class="sg-color-group__label">Feedback &amp; Bewertungsskala</div>
+    <div class="sg-color-grid">
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-success)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-success</span><span class="sg-swatch__hex">#296310</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-success-dark)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-success-dark</span><span class="sg-swatch__hex">#225210</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-success-tint)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-success-tint</span><span class="sg-swatch__hex">#e6efe0</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-danger)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-danger</span><span class="sg-swatch__hex">#a82704</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-rate-1)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-rate-1</span><span class="sg-swatch__hex">#b91c1c · Gefährlich</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-rate-2)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-rate-2</span><span class="sg-swatch__hex">#ea580c · Schlecht</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-rate-3)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-rate-3</span><span class="sg-swatch__hex">#ca8a04 · Akzeptabel</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-rate-4)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-rate-4</span><span class="sg-swatch__hex">#65a30d · Gut</span></div></div>
+      <div class="sg-swatch"><div class="sg-swatch__chip" style="background:var(--color-rate-5)"></div><div class="sg-swatch__info"><span class="sg-swatch__var">--color-rate-5</span><span class="sg-swatch__hex">#15803d · Ausgezeichnet</span></div></div>
+    </div>
+    <p class="sg-note">Die Bewertungsskala ist semantisch (VeloMelder-Ratings) und wird nie mit der Markenfarbe gemischt.</p>
+  </div>
+</section>
+
+<!-- TYPOGRAFIE TOKENS -->
+<section class="sg-section" id="typography-tokens">
+  <div class="sg-section__title">Tokens <span>--font-* · --text-* · --lh-*</span></div>
+  <div class="sg-h">Typografie-Tokens</div>
+
+  <div class="sg-component">
+    <div class="sg-preview--white" style="display:flex;flex-direction:column;gap:16px;">
+      <div>
+        <div style="font:400 11px var(--font-body);color:var(--color-muted);font-family:monospace;margin-bottom:4px;">--font-display → Jost</div>
+        <div style="font:400 28px var(--font-display);">Jost — Für sichere Velowege in Wetzikon</div>
+        <div style="font:700 28px var(--font-display);">Jost Bold — Für sichere Velowege</div>
+      </div>
+      <div>
+        <div style="font:400 11px var(--font-body);color:var(--color-muted);font-family:monospace;margin-bottom:4px;">--font-body → Roboto</div>
+        <div style="font:400 16px var(--font-body);">Roboto Regular — Private Initiative für ein velofreundliches Wetzikon.</div>
+        <div style="font:500 16px var(--font-body);">Roboto Medium — Wir vertreten die Anliegen der Velofahrenden.</div>
+        <div style="font:700 16px var(--font-body);">Roboto Bold — Veloanlässe, Politisches, Berichte.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-type-rows">
+      <div class="sg-type-row"><div class="sg-type-meta">--text-xs · 12px</div><div class="sg-type-sample" style="font-size:12px;">Velofreundliches Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-sm · 14px</div><div class="sg-type-sample" style="font-size:14px;">Velofreundliches Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-base · 16px</div><div class="sg-type-sample" style="font-size:16px;">Velofreundliches Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-lg · 18px</div><div class="sg-type-sample" style="font-size:18px;">Velofreundliches Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-xl · 22px</div><div class="sg-type-sample" style="font-size:22px;">Velofreundliches Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-2xl · 28px</div><div class="sg-type-sample" style="font-size:28px;">Velofreundliches Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-3xl · 36px</div><div class="sg-type-sample" style="font-size:36px;">Velowege Wetzikon</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-4xl · 48px</div><div class="sg-type-sample" style="font-size:48px;">Velowege</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-5xl · 64px</div><div class="sg-type-sample" style="font-size:64px;">Velo</div></div>
+      <div class="sg-type-row"><div class="sg-type-meta">--text-6xl · 80px</div><div class="sg-type-sample" style="font-size:80px;">V</div></div>
+    </div>
+    <p class="sg-note">Zeilenhöhen: --lh-tight 1.05 (Headlines) · --lh-snug 1.2 (h3–h5) · --lh-normal 1.45 · --lh-relaxed 1.6 (Fliesstext). Tracking: --tracking-tight -0.01em (Headlines) · --tracking-wide 0.08em (Eyebrows/Uppercase).</p>
+  </div>
+</section>
+
+<!-- ABSTÄNDE -->
+<section class="sg-section" id="spacing">
+  <div class="sg-section__title">Tokens <span>--space-* (8px-Raster)</span></div>
+  <div class="sg-h">Abstände</div>
+  <div class="sg-space-rows">
+    <div class="sg-space-row"><div class="sg-space-meta">--space-1 · 4px</div><div class="sg-space-bar" style="width:4px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-2 · 8px</div><div class="sg-space-bar" style="width:8px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-3 · 12px</div><div class="sg-space-bar" style="width:12px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-4 · 16px</div><div class="sg-space-bar" style="width:16px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-5 · 24px</div><div class="sg-space-bar" style="width:24px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-6 · 32px</div><div class="sg-space-bar" style="width:32px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-7 · 48px</div><div class="sg-space-bar" style="width:48px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-8 · 64px</div><div class="sg-space-bar" style="width:64px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-9 · 96px</div><div class="sg-space-bar" style="width:96px;height:20px;"></div></div>
+    <div class="sg-space-row"><div class="sg-space-meta">--space-10 · 128px</div><div class="sg-space-bar" style="width:128px;height:20px;"></div></div>
+  </div>
+</section>
+
+<!-- RADIEN -->
+<section class="sg-section" id="radii">
+  <div class="sg-section__title">Tokens <span>--radius-*</span></div>
+  <div class="sg-h">Eckenradien</div>
+  <div class="sg-radius-row">
+    <div class="sg-radius-item"><div class="sg-radius-box" style="border-radius:var(--radius-sm);"></div><div class="sg-radius-label">--radius-sm<br>4px</div></div>
+    <div class="sg-radius-item"><div class="sg-radius-box" style="border-radius:var(--radius-md);"></div><div class="sg-radius-label">--radius-md<br>8px</div></div>
+    <div class="sg-radius-item"><div class="sg-radius-box" style="border-radius:var(--radius-lg);"></div><div class="sg-radius-label">--radius-lg<br>12px</div></div>
+    <div class="sg-radius-item"><div class="sg-radius-box" style="border-radius:var(--radius-full);"></div><div class="sg-radius-label">--radius-full<br>999px</div></div>
+  </div>
+</section>
+
+<!-- SCHATTEN -->
+<section class="sg-section" id="shadows">
+  <div class="sg-section__title">Tokens <span>--shadow-*</span></div>
+  <div class="sg-h">Schatten</div>
+  <div class="sg-shadow-row" style="padding:24px;background:var(--color-surface-2);border-radius:8px;">
+    <div class="sg-shadow-box" style="box-shadow:var(--shadow-sm);"><span class="sg-shadow-name">--shadow-sm</span></div>
+    <div class="sg-shadow-box" style="box-shadow:var(--shadow-md);"><span class="sg-shadow-name">--shadow-md</span></div>
+    <div class="sg-shadow-box" style="box-shadow:var(--shadow-lg);"><span class="sg-shadow-name">--shadow-lg</span></div>
+  </div>
+</section>
+
+<!-- LAYOUT / BREAKPOINTS / MOTION -->
+<section class="sg-section" id="layout-tokens">
+  <div class="sg-section__title">Tokens <span>Layout, Breakpoints, Motion</span></div>
+  <div class="sg-h">Layout</div>
+
+  <div class="sg-layout-grid" style="margin-bottom:32px;">
+    <div class="sg-layout-card"><div class="sg-layout-card__label">Max-Breite</div><div class="sg-layout-card__value">1400px</div><div class="sg-layout-card__desc">--max-w</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">Seitenabstand</div><div class="sg-layout-card__value">20 / 32px</div><div class="sg-layout-card__desc">--gutter (mobile / ≥600px)</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">Prose-Breite</div><div class="sg-layout-card__value">680px</div><div class="sg-layout-card__desc">--container-prose</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">Nav-Höhe</div><div class="sg-layout-card__value">64 / 72px</div><div class="sg-layout-card__desc">--nav-h (mobile / ≥960px)</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">Nav-Breakpoint</div><div class="sg-layout-card__value">960px</div><div class="sg-layout-card__desc">--nav-breakpoint · mobile → desktop</div></div>
+  </div>
+
+  <div style="margin-bottom:8px;font:600 11px var(--font-body);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-muted);">Breakpoints</div>
+  <div class="sg-bp-rows">
+    <div class="sg-bp-row"><div class="sg-bp-name">0px</div><div class="sg-bp-track"><div class="sg-bp-fill" style="width:100%"></div></div><div class="sg-bp-desc">Mobile (Standard)</div></div>
+    <div class="sg-bp-row"><div class="sg-bp-name">600px</div><div class="sg-bp-track"><div class="sg-bp-fill" style="width:42.8%"></div></div><div class="sg-bp-desc">Tablet — 2-Spalten, grössere Abstände</div></div>
+    <div class="sg-bp-row"><div class="sg-bp-name">720px</div><div class="sg-bp-track"><div class="sg-bp-fill" style="width:51.4%"></div></div><div class="sg-bp-desc">Melde-Karte horizontal</div></div>
+    <div class="sg-bp-row"><div class="sg-bp-name">960px</div><div class="sg-bp-track"><div class="sg-bp-fill" style="width:68.5%"></div></div><div class="sg-bp-desc">Desktop — volle Navigation, alle Grids</div></div>
+  </div>
+
+  <div style="margin-top:24px;margin-bottom:8px;font:600 11px var(--font-body);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-muted);">Motion</div>
+  <div class="sg-layout-grid">
+    <div class="sg-layout-card"><div class="sg-layout-card__label">--dur-fast</div><div class="sg-layout-card__value">120ms</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">--dur</div><div class="sg-layout-card__value">180ms</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">--dur-slow</div><div class="sg-layout-card__value">280ms</div></div>
+    <div class="sg-layout-card"><div class="sg-layout-card__label">--ease</div><div class="sg-layout-card__value" style="font-size:13px;">cubic-bezier</div><div class="sg-layout-card__desc">(.2, .7, .3, 1)</div></div>
+  </div>
+</section>
+
+</main>
+</div>
+</body>
+</html>

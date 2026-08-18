@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contao-Implementierung — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="_colors-and-type-snapshot.css">
+<link rel="stylesheet" href="_site-snapshot.css">
+<style>
+/* This page's own shell only -- components above come from the two snapshot files (see their
+   headers), tokens from ../tokens.css. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+
+.sg-wrap { display: flex; min-height: 100vh; }
+.sg-sidebar { width: 224px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; background: #0d0d0d; padding: 0 0 32px; z-index: 200; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+.sg-sidebar__head { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sg-sidebar__title { font: 700 14px var(--font-display); color: #fff; display: block; }
+.sg-sidebar__sub   { font: 400 11px var(--font-body); color: rgba(255,255,255,0.35); margin-top: 2px; display: block; }
+.sg-nav-group { margin-bottom: 2px; }
+.sg-nav-section { padding: 14px 20px 4px; font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+.sg-nav a { display: block; padding: 5px 20px 5px 28px; font: 400 12px var(--font-body); color: rgba(255,255,255,0.55); text-decoration: none; transition: color 120ms, background 120ms; border-left: 2px solid transparent; }
+.sg-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--color-primary); }
+.sg-nav a.sg-nav-crosslink { color: var(--color-primary); font-weight: 500; }
+
+.sg-main { margin-left: 224px; flex: 1; max-width: 1200px; }
+.sg-section { padding: 48px 48px 56px; border-bottom: 1px solid var(--color-border); }
+.sg-section:last-child { border-bottom: none; }
+.sg-section__title { font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 12px; margin-bottom: 28px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; }
+.sg-section__title span { font: 400 11px var(--font-body); text-transform: none; letter-spacing: 0; color: var(--color-border-strong); font-family: monospace; }
+.sg-h { font: 600 22px/1.2 var(--font-display); margin: 0 0 28px; }
+.sg-intro { font: 400 15px/1.6 var(--font-body); color: var(--color-text-muted); max-width: 720px; margin: -8px 0 32px; }
+
+.sg-component { margin-bottom: 44px; }
+.sg-component__labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.sg-badge { font: 500 11px/1 var(--font-body); font-family: monospace; border-radius: 3px; padding: 3px 7px; display: inline-block; }
+.sg-badge--css     { background: #f0f0ef; border: 1px solid #ddd; color: #333; }
+.sg-badge--contao  { background: var(--color-primary-tint); border: 1px solid #f0b89a; color: #8a2000; }
+.sg-badge--tpl     { background: #eef4ff; border: 1px solid #c7d9f8; color: #1a4a9a; }
+.sg-badge--php     { background: #f0eeff; border: 1px solid #c8bef8; color: #3a1a8a; }
+.sg-badge--label   { font: 600 11px var(--font-body); color: var(--color-muted); font-family: inherit; background: none; border: none; padding: 0; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; }
+.sg-badge--live    { background: #fff4e5; border: 1px solid #f5c877; color: #8a5a00; }
+
+.sg-preview { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--white { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--dark { background: #111; border: 1px solid #222; border-radius: 8px; }
+.sg-preview--fullbleed { border-radius: 8px; overflow: hidden; border: 1px solid var(--color-border); }
+
+.sg-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+.sg-divider { border: none; border-top: 1px solid var(--color-border); margin: 32px 0; }
+.sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+
+.sg-callout-box {
+  background: #fff4e5; border: 1px solid #f5c877; border-radius: 8px;
+  padding: 16px 20px; margin: -8px 0 32px; max-width: 720px;
+  font: 400 13px/1.6 var(--font-body); color: #6b4500;
+}
+.sg-callout-box strong { color: #4a2f00; }
+
+.sg-hero-mock .vw-hero__img {
+  background: linear-gradient(135deg, #e8e6e0 0%, #d5d3cc 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--color-muted); font: 400 13px var(--font-body);
+}
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+
+<aside class="sg-sidebar">
+  <div class="sg-sidebar__head">
+    <span class="sg-sidebar__title">Contao-Implementierung</span>
+    <span class="sg-sidebar__sub">Velofreundliches Wetzikon</span>
+  </div>
+  <nav class="sg-nav">
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Primitive</span>
+      <a href="#typography">Typografie-Stile</a>
+      <a href="#buttons">Buttons</a>
+      <a href="#tags">Tags / Pills</a>
+      <a href="#callouts">Callouts</a>
+      <a href="#cards">Cards</a>
+      <a href="#forms">Formular-Felder</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Contao-Elemente</span>
+      <a href="#el-hero">velo_hero</a>
+      <a href="#el-melde">velo_melde</a>
+      <a href="#el-newsletter">velo_newsletter</a>
+      <a href="#el-positions">velo_positions</a>
+      <a href="#el-join">velo_join</a>
+      <a href="#el-tabs">velo_tabs</a>
+      <a href="#callouts">velo_callout (Text-Vorlage)</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Struktur</span>
+      <a href="#navigation">Navigation (2 Ebenen)</a>
+      <a href="#events">Veranstaltungs-Karten</a>
+      <a href="#news">News-Karten</a>
+      <a href="#modal">Modal (Stelle melden)</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Diese Doku-Seite</span>
+      <a href="tokens.html" class="sg-nav-crosslink">→ Design Tokens</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="sg-main">
+
+<section class="sg-section" id="intro">
+  <div class="sg-section__title">Über diese Seite <span>velofreundliches-wetzikon-design-tokens</span></div>
+  <div class="sg-h">Contao-Implementierung</div>
+  <p class="sg-intro">
+    Diese Seite zeigt, wie die Design-Tokens (siehe <a href="tokens.html" style="color:var(--color-primary);">Design Tokens</a>)
+    in der öffentlichen Contao-CMS-Site tatsächlich zu Komponenten zusammengesetzt werden —
+    Buttons, Karten, Formulare, die projektspezifischen Content-Elemente (<code>velo_*</code>)
+    und Struktur-Stücke wie Navigation, Events, News und das globale Melde-Modal. Jede Komponente
+    ist mit dem echten Template-/Controller-Dateinamen beschriftet.
+  </p>
+  <div class="sg-callout-box">
+    <strong>Zum Stand dieser Beispiele:</strong> Die <strong>Navigation</strong> unten ist inzwischen
+    live von <code>http://localhost:8000/</code> übernommen (echte Seitenbaum-Struktur, echte
+    <code>nav_subtitle</code>-Felder, echte Links — Docker/Colima liefen dafür kurz, Container
+    <code>velowetzikon-mariadb</code>). <strong>Events und News</strong> sind weiterhin mit
+    <span class="sg-badge sg-badge--live" style="vertical-align:1px;">repräsentativ</span> markiert:
+    die geprüften Seiten (<code>/veranstaltungen</code>, <code>/news/neuigkeiten</code>) hatten zum
+    Zeitpunkt der Erstellung keine passenden <code>.vw-event</code>/<code>.vw-news__card</code>-Elemente
+    im HTML (keine aktuell publizierten Einträge oder Module nicht auf diesen Seiten platziert) — Struktur,
+    CSS-Klassen bleiben exakt aus den echten Templates übernommen, nur die Texte sind Platzhalter.
+  </div>
+</section>
+
+<!-- TYPOGRAFIE-STILE -->
+<section class="sg-section" id="typography">
+  <div class="sg-section__title">Primitive <span>colors_and_type.css</span></div>
+  <div class="sg-h">Typografie-Stile</div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">h1</span><span class="sg-badge sg-badge--label">Jost 700 · clamp(48px → 80px) · lh-tight · tracking-tight</span></div>
+    <div class="sg-preview--white"><h1>Für sichere Velowege in Wetzikon</h1></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">h2</span><span class="sg-badge sg-badge--label">Jost 600 · clamp(36px → 48px) · lh-tight</span></div>
+    <div class="sg-preview--white"><h2>Bleib auf dem Laufenden.</h2></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">h3</span><span class="sg-badge sg-badge--label">Jost 600 · 28px · lh-snug</span></div>
+    <div class="sg-preview--white"><h3>Gefährliche Stelle entdeckt?</h3></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">h4</span><span class="sg-badge sg-badge--label">Jost 600 · 22px · lh-snug</span></div>
+    <div class="sg-preview--white"><h4>Velopolitik und Anlässe</h4></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">h5</span><span class="sg-badge sg-badge--label">Roboto 700 · 12px · uppercase · tracking-wide</span></div>
+    <div class="sg-preview--white"><h5>Kategorie-Label</h5></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">p (body)</span><span class="sg-badge sg-badge--label">Roboto 400 · 16px · lh-relaxed (1.6)</span></div>
+    <div class="sg-preview--white"><p>Private Initiative für ein velofreundliches Wetzikon. Wir vertreten die Anliegen der Velofahrenden gegenüber Stadt, Kanton, Firmen und Öffentlichkeit.</p></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-eyebrow</span><span class="sg-badge sg-badge--label">Roboto 700 · 12px · uppercase · tracking-wide · color-primary</span></div>
+    <div class="sg-preview--white"><span class="vw-eyebrow">Interessengemeinschaft · Wetzikon ZH</span></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-eyebrow--accent</span><span class="sg-badge sg-badge--label">Auf dunklem Hintergrund · color-accent (#fdd003)</span></div>
+    <div class="sg-preview--dark" style="padding:20px 28px;"><span class="vw-eyebrow vw-eyebrow--accent">Newsletter</span></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-lead</span><span class="sg-badge sg-badge--label">Roboto 400 · 22px · lh-relaxed · color-text-muted</span></div>
+    <div class="sg-preview--white"><p class="vw-lead">Wir setzen uns für sichere Velowege, gut ausgeschilderte Routen und ausreichend Abstellplätze ein.</p></div>
+  </div>
+</section>
+
+<!-- BUTTONS -->
+<section class="sg-section" id="buttons">
+  <div class="sg-section__title">Primitive <span>.vw-btn · colors_and_type.css</span></div>
+  <div class="sg-h">Buttons</div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-btn--primary</span><span class="sg-badge sg-badge--label">Primäraktion · bg color-primary</span></div>
+    <div class="sg-row">
+      <button class="vw-btn vw-btn--primary vw-btn--sm">Klein <i data-lucide="arrow-right" width="14" height="14"></i></button>
+      <button class="vw-btn vw-btn--primary">Standard <i data-lucide="arrow-right" width="16" height="16"></i></button>
+      <button class="vw-btn vw-btn--primary vw-btn--lg">Gross <i data-lucide="arrow-right" width="18" height="18"></i></button>
+    </div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-btn--secondary</span><span class="sg-badge sg-badge--label">Sekundäraktion · weisser Hintergrund, schwarzer Rand</span></div>
+    <div class="sg-row">
+      <button class="vw-btn vw-btn--secondary vw-btn--sm">Mehr erfahren</button>
+      <button class="vw-btn vw-btn--secondary">Mehr erfahren</button>
+      <button class="vw-btn vw-btn--secondary vw-btn--lg">Mehr erfahren</button>
+    </div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-btn--ghost</span><span class="sg-badge sg-badge--label">Tertiäraktion · transparent</span></div>
+    <div class="sg-row"><button class="vw-btn vw-btn--ghost">Details anzeigen</button></div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-btn--ondark</span><span class="sg-badge sg-badge--label">Auf dunklem Hintergrund · weisser Rand</span></div>
+    <div class="sg-preview--dark" style="padding:20px 28px;">
+      <div class="sg-row">
+        <button class="vw-btn vw-btn--ondark">Mehr erfahren</button>
+        <button class="vw-btn vw-btn--primary">Stelle melden <i data-lucide="map-pin" width="16" height="16"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-btn--block</span><span class="sg-badge sg-badge--label">Volle Breite</span></div>
+    <div style="max-width:320px;"><button class="vw-btn vw-btn--primary vw-btn--block">Jetzt anmelden <i data-lucide="arrow-right" width="16" height="16"></i></button></div>
+  </div>
+</section>
+
+<!-- TAGS -->
+<section class="sg-section" id="tags">
+  <div class="sg-section__title">Primitive <span>.vw-tag · colors_and_type.css</span></div>
+  <div class="sg-h">Tags / Pills</div>
+  <div class="sg-row">
+    <span class="vw-tag vw-tag--neutral">Neutral</span>
+    <span class="vw-tag vw-tag--primary">Velopolitik</span>
+    <span class="vw-tag vw-tag--success">Umgesetzt</span>
+    <span class="vw-tag vw-tag--outline">Geplant</span>
+    <span class="vw-tag vw-tag--dark">Archiviert</span>
+  </div>
+  <p class="sg-note">Verwendung: Veranstaltungs-Kategorien, Status-Labels, News-Tags</p>
+</section>
+
+<!-- CALLOUTS -->
+<section class="sg-section" id="callouts">
+  <div class="sg-section__title">Primitive <span>.vw-callout · colors_and_type.css</span></div>
+  <div class="sg-h">Callouts</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--tpl">content_element/text/velo_callout.html.twig</span>
+    <span class="sg-badge sg-badge--label">Auswählbar im Standard-Text-Element (Experte-Tab → Template) · kein eigener Elementtyp</span>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-callout--action</span></div>
+    <div class="vw-callout vw-callout--action">Neue Stellungnahme zur Veloroute Ost veröffentlicht. Bitte lesen und weiterleiten.</div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-callout--success</span></div>
+    <div class="vw-callout vw-callout--success">Ihre Meldung wurde erfolgreich eingereicht. Danke für Ihren Beitrag!</div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-callout--info</span></div>
+    <div class="vw-callout vw-callout--info">Diese Seite ist nur für Mitglieder sichtbar. Bitte melden Sie sich an.</div>
+  </div>
+  <p class="sg-note">Das echte Template (<code>velo_callout</code>) rendert nur die <code>--action</code>-Variante fest verdrahtet, mit <code>alert-circle</code>-Icon und optionalem <code>headline</code>-Titel. <code>--success</code>/<code>--info</code> oben sind CSS-Primitive ohne eigenes Contao-Template — bislang nur inline oder in anderen Templates verwendet.</p>
+</section>
+
+<!-- CARDS -->
+<section class="sg-section" id="cards">
+  <div class="sg-section__title">Primitive <span>.vw-card · colors_and_type.css</span></div>
+  <div class="sg-h">Cards</div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-card</span></div>
+    <div class="vw-card" style="max-width:320px;">
+      <h4>Veloroute Ost</h4>
+      <p style="color:var(--color-text-muted);font-size:14px;margin-top:8px;">Die Verbindung zwischen Bahnhof und Industriequartier ist lückenhaft und gefährlich.</p>
+    </div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-card--campaign</span><span class="sg-badge sg-badge--label">Rotes Top-Border</span></div>
+    <div class="vw-card vw-card--campaign" style="max-width:320px;">
+      <span class="vw-tag vw-tag--primary" style="margin-bottom:12px;">Aktive Kampagne</span>
+      <h4>30 Tempo-Zonen mehr</h4>
+      <p style="color:var(--color-text-muted);font-size:14px;margin-top:8px;">Wir fordern sichere Geschwindigkeiten in Wohnquartieren.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FORMULAR-FELDER -->
+<section class="sg-section" id="forms">
+  <div class="sg-section__title">Primitive <span>Form inputs · colors_and_type.css</span></div>
+  <div class="sg-h">Formular-Felder</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;max-width:640px;">
+    <div>
+      <label class="field-label">E-Mail-Adresse <span class="required">*</span></label>
+      <input type="email" placeholder="name@email.ch">
+    </div>
+    <div>
+      <label class="field-label">Name</label>
+      <input type="text" placeholder="Vorname Nachname">
+    </div>
+    <div>
+      <label class="field-label">Fokus-Zustand</label>
+      <input type="text" value="Aktiver Fokus" class="field-valid">
+    </div>
+    <div>
+      <label class="field-label">Fehler-Zustand</label>
+      <input type="text" value="Ungültig" class="error">
+      <div class="error-text">Bitte geben Sie eine gültige E-Mail-Adresse ein.</div>
+    </div>
+    <div style="grid-column:1/-1;">
+      <label class="field-label">Beschreibung <span class="field-optional">(optional)</span></label>
+      <textarea rows="3" placeholder="Beschreiben Sie die gefährliche Stelle…"></textarea>
+      <div class="field-note">Maximal 500 Zeichen.</div>
+    </div>
+  </div>
+  <hr class="sg-divider">
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-radio-card</span><span class="sg-badge sg-badge--label" style="color:#8a5a00;">Geplant — noch kein Contao-Formular nutzt dieses Markup</span></div>
+    <div class="vw-radio-cards" style="max-width:480px;">
+      <label class="vw-radio-card">
+        <input type="radio" name="demo" checked>
+        <span class="vw-radio-card__label">Einzelmitglied</span>
+        <span class="vw-radio-card__price">CHF 30</span>
+        <span class="vw-radio-card__sub">pro Jahr</span>
+      </label>
+      <label class="vw-radio-card">
+        <input type="radio" name="demo">
+        <span class="vw-radio-card__label">Familienmitglied</span>
+        <span class="vw-radio-card__price">CHF 50</span>
+        <span class="vw-radio-card__sub">pro Jahr</span>
+      </label>
+      <label class="vw-radio-card">
+        <input type="radio" name="demo">
+        <span class="vw-radio-card__label">Gönnermitglied</span>
+        <span class="vw-radio-card__price">CHF 100</span>
+        <span class="vw-radio-card__sub">pro Jahr</span>
+      </label>
+    </div>
+    <p class="sg-note">Diese CSS existiert bereits in <code>site.css</code>, wird aber aktuell von keinem Twig-Template oder Contao-Formular referenziert — vorbereitet für ein zukünftiges Mitgliedschaftsformular, aber noch nicht live.</p>
+  </div>
+</section>
+
+<!-- velo_hero -->
+<section class="sg-section" id="el-hero">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Hero-Block</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_hero</span>
+    <span class="sg-badge sg-badge--css">.vw-hero</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_hero.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloHeroController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Felder: <code>velo_hero_title</code> (h1, HTML erlaubt) · <code>velo_eyebrow</code> · <code>velo_lead</code> · <code>velo_btn_primary_*</code> · <code>velo_btn_secondary_*</code> · <code>velo_stats</code> · <code>addImage</code> — Bild: <code>border-radius: var(--radius-md) · 8px</code></div>
+  <div class="sg-preview--fullbleed sg-hero-mock">
+    <div class="vw-hero vw-container">
+      <div class="vw-hero__grid">
+        <div class="vw-hero__content">
+          <span class="vw-eyebrow">Interessengemeinschaft · Wetzikon ZH</span>
+          <h1 class="vw-hero__title">Für sichere <em>Velowege</em> in Wetzikon</h1>
+          <p class="vw-hero__lead">Wir setzen uns für sichere Velowege, gut ausgeschilderte Routen und ausreichend Abstellplätze ein.</p>
+          <div class="vw-hero__btns">
+            <button class="vw-btn vw-btn--primary">Stelle melden <i data-lucide="map-pin" width="16" height="16"></i></button>
+            <button class="vw-btn vw-btn--secondary">Mehr erfahren</button>
+          </div>
+          <div class="vw-hero__stats">
+            <div><div class="vw-hero__stat-value">412</div><div class="vw-hero__stat-label">Mitglieder</div></div>
+            <div><div class="vw-hero__stat-value">38</div><div class="vw-hero__stat-label">Stellungnahmen</div></div>
+            <div><div class="vw-hero__stat-value">12</div><div class="vw-hero__stat-label">Jahre aktiv</div></div>
+          </div>
+        </div>
+        <div class="vw-hero__img">Heldbild (460 × 460px)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- velo_melde -->
+<section class="sg-section" id="el-melde">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">VeloMelde-Streifen</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_melde</span>
+    <span class="sg-badge sg-badge--css">.vw-melde</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_melde.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloMeldeController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Felder: <code>velo_eyebrow</code> · <code>headline</code> (h3) · <code>text</code> · <code>velo_btn_label</code> · <code>velo_form_id</code> (öffnet globales Modal mit insert_form::ID)</div>
+  <div class="sg-preview--fullbleed">
+    <section class="vw-melde">
+      <div class="vw-melde__card">
+        <div class="vw-melde__text">
+          <span class="vw-eyebrow">VeloMelde-Karte</span>
+          <h3 class="vw-melde__heading">Gefährliche Stelle entdeckt? Melden Sie sie uns.</h3>
+          <div class="vw-melde__body"><p>Wir sammeln Hinweise zu Kreuzungen, Routen und Abstellplätzen und führen sie in unseren Stellungnahmen zusammen.</p></div>
+        </div>
+        <div class="vw-melde__btn"><button class="vw-btn vw-btn--primary">Stelle melden <i data-lucide="arrow-right" width="16" height="16"></i></button></div>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- velo_newsletter -->
+<section class="sg-section" id="el-newsletter">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Newsletter-Anmeldung</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_newsletter</span>
+    <span class="sg-badge sg-badge--css">.vw-newsletter</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_newsletter.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloNewsletterController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Felder: <code>velo_eyebrow</code> · <code>headline</code> (h2) · <code>text</code> · <code>velo_form_id</code> (tl_form ID 4) · <code>velo_benefits</code> (Stichpunkte-Liste rechts) — Grid: 1.4fr / 1fr ab 960px</div>
+  <div class="sg-preview--fullbleed">
+    <section class="vw-newsletter">
+      <div class="vw-newsletter__inner">
+        <div class="vw-newsletter__main">
+          <span class="vw-eyebrow vw-eyebrow--accent">Newsletter</span>
+          <h2>Bleib auf dem Laufenden.</h2>
+          <p>Veloanlässe, Politisches und was sich in Wetzikon verändert — 10× im Jahr, direkt in dein Postfach.</p>
+          <div class="vw-newsletter__form">
+            <div class="formbody" style="display:flex;flex-wrap:wrap;gap:12px;align-items:flex-end;margin-top:24px;">
+              <div class="widget widget-text" style="flex:1;min-width:200px;">
+                <label style="position:absolute;width:1px;height:1px;overflow:hidden;">E-Mail</label>
+                <input type="email" placeholder="deine@email.ch" style="background:rgba(255,255,255,0.08);border:1.5px solid rgba(255,255,255,0.2);color:#fff;height:44px;">
+              </div>
+              <div class="widget widget-submit">
+                <button type="button" style="height:44px;padding:0 24px;background:var(--color-primary);color:#fff;border:none;border-radius:8px;font:600 14px var(--font-display);cursor:pointer;">Anmelden →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="vw-check-list">
+          <li>Veloanlässe in Wetzikon</li>
+          <li>Neuigkeiten aus der Velopolitik</li>
+          <li>Aktuelle Berichte und Tests</li>
+          <li>Fortschritte für ein velofreundlicheres Wetzikon</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- velo_positions -->
+<section class="sg-section" id="el-positions">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Positions-Karten (3-Spalten)</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_positions</span>
+    <span class="sg-badge sg-badge--css">.vw-cards-3</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_positions.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloPositionsController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Felder: <code>velo_section_eyebrow</code> · <code>velo_section_heading</code> · <code>velo_section_lead</code> · <code>velo_cards</code> (multiColumnWizard: icon, eyebrow, title, body, href, link_label) — Grid: 1→2→3 Spalten</div>
+  <div class="sg-preview--fullbleed" style="padding:32px;">
+    <div class="vw-cards-3">
+      <div class="vw-card">
+        <div class="vw-card__icon"><i data-lucide="route" width="40" height="40"></i></div>
+        <span class="vw-eyebrow vw-card__eyebrow">Infrastruktur</span>
+        <h3>Sichere Velorouten</h3>
+        <p>Wir analysieren bestehende Routen und fordern Lückenschlüsse bei Gemeinde und Kanton.</p>
+        <a href="#" class="vw-card__link">Mehr erfahren <i data-lucide="arrow-right" width="14" height="14"></i></a>
+      </div>
+      <div class="vw-card">
+        <div class="vw-card__icon"><i data-lucide="parking-square" width="40" height="40"></i></div>
+        <span class="vw-eyebrow vw-card__eyebrow">Abstellplätze</span>
+        <h3>Mehr Veloplätze</h3>
+        <p>Gute Abstellplätze am Bahnhof, bei Schulen, Läden und öffentlichen Gebäuden.</p>
+        <a href="#" class="vw-card__link">Mehr erfahren <i data-lucide="arrow-right" width="14" height="14"></i></a>
+      </div>
+      <div class="vw-card">
+        <div class="vw-card__icon"><i data-lucide="megaphone" width="40" height="40"></i></div>
+        <span class="vw-eyebrow vw-card__eyebrow">Interessenvertretung</span>
+        <h3>Politische Arbeit</h3>
+        <p>Stellungnahmen, Vernehmlassungen und direkter Dialog mit Behörden und Unternehmen.</p>
+        <a href="#" class="vw-card__link">Mehr erfahren <i data-lucide="arrow-right" width="14" height="14"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- velo_join -->
+<section class="sg-section" id="el-join">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Mitgliedschaft-Block</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_join</span>
+    <span class="sg-badge sg-badge--css">.vw-join</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_join.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloJoinController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Felder: <code>headline</code> (h2) · <code>velo_eyebrow</code> · <code>text</code> · <code>velo_btn_primary_*</code> · <code>velo_btn_secondary_*</code> · <code>velo_benefits</code> (Häkchenliste rechts) — Geplant für Seite «Mitglied werden»</div>
+  <div class="sg-preview--fullbleed">
+    <section class="vw-join">
+      <div class="vw-join__inner">
+        <div>
+          <span class="vw-eyebrow vw-eyebrow--accent">Mitgliedschaft</span>
+          <h2>Werde Teil der Bewegung.</h2>
+          <p>Als Mitglied stärkst du unsere Stimme gegenüber Stadt, Kanton und Öffentlichkeit.</p>
+          <div class="vw-join__btns">
+            <a href="#" class="vw-btn vw-btn--primary">Mitglied werden <i data-lucide="arrow-right" width="16" height="16"></i></a>
+            <a href="#" class="vw-btn vw-btn--ondark">Mehr erfahren</a>
+          </div>
+        </div>
+        <ul class="vw-check-list">
+          <li>Mitreden bei Stellungnahmen</li>
+          <li>Newsletter und Einladungen</li>
+          <li>Verein stärken ab CHF 30/Jahr</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</section>
+
+<!-- velo_tabs -->
+<section class="sg-section" id="el-tabs">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Tab-Navigation</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_tabs</span>
+    <span class="sg-badge sg-badge--css">.vw-tabs__nav · .vw-tabs__panel</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_tabs.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloTabsController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Felder: <code>velo_tabs</code> (multiColumnWizard: label, content) — Sticky unterhalb Nav (top: --nav-h) · Geplant für Seite «Themen»</div>
+  <div class="sg-preview--fullbleed">
+    <div class="vw-tabs__nav" style="position:static;">
+      <button class="vw-tabs__tab active">Velorouten</button>
+      <button class="vw-tabs__tab">Abstellplätze</button>
+      <button class="vw-tabs__tab">Tempo & Sicherheit</button>
+      <button class="vw-tabs__tab">Schulwege</button>
+    </div>
+    <div style="padding:32px;">
+      <div class="vw-tabs__panel active">
+        <h3>Velorouten in Wetzikon</h3>
+        <p style="color:var(--color-text-muted);margin-top:12px;">Inhalt des aktiven Tabs. Jedes Tab wird als eigenständiger HTML-Block im multiColumnWizard hinterlegt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NAVIGATION (2 Ebenen) -->
+<section class="sg-section" id="navigation">
+  <div class="sg-section__title">Struktur <span>mod_navigation_accessible.html.twig · nav_default.html.twig</span></div>
+  <div class="sg-h">Navigation (2 Ebenen)</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--tpl">mod_navigation_accessible.html.twig</span>
+    <span class="sg-badge sg-badge--tpl">nav_default.html.twig</span>
+    <span class="sg-badge sg-badge--label">Standalone (kein extends) · Slot: header</span>
+    <span class="sg-badge sg-badge--css">Live aus localhost:8000/ übernommen, 2026-08-17</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">
+    Höhe: <strong>64px</strong> (mobil) / <strong>72px</strong> (≥960px) · Position: <code>sticky top:0</code> ·
+    Desktop-Trigger mit Kindern → <code>&lt;button class="vw-nav__trigger"&gt;</code> + Chevron + <code>.vw-nav__panel</code>
+    (öffnet per Hover/Fokus <em>und</em> Klick, per JS <code>is-open</code>-Klasse — barrierefrei für Touch/Tastatur);
+    Blatt-Items → einfaches <code>&lt;a class="vw-nav__trigger"&gt;</code>. Sub-Items (<code>.vw-nav__suba</code>) zeigen
+    Titel (<code>item.link</code>) + optionale Unterzeile (<code>item.nav_subtitle</code>, ein Contao-Seitenfeld).
+    Mobil (&lt; 960px): Burger öffnet <code>.vw-drawer</code> (fixed, Scrim), gleiche Klassen als Akkordeon
+    statt Hover-Dropdown. Diese Demo ist <strong>voll interaktiv</strong> — probieren Sie „News" aus.
+    Inhalt unten ist <strong>live von der laufenden Contao-Instanz übernommen</strong> (nicht mehr
+    repräsentativ) — echte Seitenbaum-Struktur, echte <code>nav_subtitle</code>-Felder, echte Links.
+  </div>
+
+  <div class="sg-preview--fullbleed" style="overflow:visible;">
+    <header class="vw-nav" style="position:static;">
+      <div class="vw-nav__inner">
+        <a href="#" class="vw-logo" style="pointer-events:none;">
+          <span class="vw-logo__bar"></span>
+          <span class="vw-logo__text">
+            <span class="vw-logo__top">velofreundliches</span>
+            <span class="vw-logo__bottom">WETZIKON</span>
+          </span>
+        </a>
+
+        <nav class="vw-nav__links" aria-label="Hauptnavigation" style="display:flex;">
+          <div class="vw-nav__item">
+            <button class="vw-nav__trigger" type="button" aria-expanded="false" aria-haspopup="true">
+              News
+              <svg class="vw-nav__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="vw-nav__panel" role="menu">
+              <a class="vw-nav__suba" href="/news/neuigkeiten" role="menuitem"><b>Neuigkeiten</b><span>Aktuelles von uns</span></a>
+              <a class="vw-nav__suba" href="/projekte-der-stadt" role="menuitem"><b>Projekte der Stadt</b><span>Was Wetzikon plant und baut</span></a>
+              <a class="vw-nav__suba" href="/ufsteller" role="menuitem"><b>Ufsteller</b><span>Erfreuliches rund ums Velo</span></a>
+            </div>
+          </div>
+          <div class="vw-nav__item">
+            <button class="vw-nav__trigger" type="button" aria-expanded="false" aria-haspopup="true">
+              Tests
+              <svg class="vw-nav__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="vw-nav__panel" role="menu">
+              <a class="vw-nav__suba" href="/velowege-und-strassen-infrastruktur" role="menuitem"><b>Velowege und Strassen-Infrastruktur</b><span>Routen, Knoten und Markierungen im Test</span></a>
+              <a class="vw-nav__suba" href="/tests/parkplaetze-und-abstellmoeglichkeiten" role="menuitem"><b>Parkplätze und Abstellmöglichkeiten</b><span>Velo-Parkplätze unter der Lupe</span></a>
+            </div>
+          </div>
+          <div class="vw-nav__item">
+            <button class="vw-nav__trigger" type="button" aria-expanded="false" aria-haspopup="true">
+              Service
+              <svg class="vw-nav__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="vw-nav__panel" role="menu">
+              <a class="vw-nav__suba" href="/ausfluege" role="menuitem"><b>Ausflüge</b><span>Tourenvorschläge in der Region</span></a>
+              <a class="vw-nav__suba" href="/links" role="menuitem"><b>Links</b><span>Nützliches und Partner</span></a>
+            </div>
+          </div>
+          <div class="vw-nav__item"><a class="vw-nav__trigger" href="/kontakt">Kontakt</a></div>
+        </nav>
+
+        <span class="vw-nav__spacer"></span>
+        <button type="button" class="vw-btn vw-btn--primary vw-btn--sm vw-nav__cta">Stelle melden <i data-lucide="map-pin" width="16" height="16"></i></button>
+        <button class="vw-burger" id="sgBurger" type="button" aria-label="Navigation öffnen" aria-expanded="false" aria-controls="sgDrawer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+            <line x1="4" y1="7" x2="20" y2="7"></line><line x1="4" y1="12" x2="20" y2="12"></line><line x1="4" y1="17" x2="20" y2="17"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="vw-drawer" id="sgDrawer" aria-hidden="true" style="position:absolute;">
+        <div class="vw-drawer__scrim" data-drawer-close></div>
+        <div class="vw-drawer__panel" role="dialog" aria-modal="true" aria-label="Navigation">
+          <div class="vw-drawer__head">
+            <a href="#" class="vw-logo" style="pointer-events:none;">
+              <span class="vw-logo__bar"></span>
+              <span class="vw-logo__text"><span class="vw-logo__top">velofreundliches</span><span class="vw-logo__bottom">WETZIKON</span></span>
+            </a>
+            <button class="vw-drawer__close" type="button" aria-label="Menü schliessen" data-drawer-close>
+              <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true"><line x1="1" y1="1" x2="13" y2="13"></line><line x1="13" y1="1" x2="1" y2="13"></line></svg>
+            </button>
+          </div>
+          <div class="vw-drawer__scroll">
+            <div class="vw-nav__item">
+              <button class="vw-nav__trigger" type="button" aria-expanded="false">
+                News
+                <svg class="vw-nav__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="vw-nav__panel">
+                <a class="vw-nav__suba" href="/news/neuigkeiten"><b>Neuigkeiten</b></a>
+                <a class="vw-nav__suba" href="/projekte-der-stadt"><b>Projekte der Stadt</b></a>
+                <a class="vw-nav__suba" href="/ufsteller"><b>Ufsteller</b></a>
+              </div>
+            </div>
+            <div class="vw-nav__item">
+              <button class="vw-nav__trigger" type="button" aria-expanded="false">
+                Tests
+                <svg class="vw-nav__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="vw-nav__panel">
+                <a class="vw-nav__suba" href="/velowege-und-strassen-infrastruktur"><b>Velowege und Strassen-Infrastruktur</b></a>
+                <a class="vw-nav__suba" href="/tests/parkplaetze-und-abstellmoeglichkeiten"><b>Parkplätze und Abstellmöglichkeiten</b></a>
+              </div>
+            </div>
+            <div class="vw-nav__item">
+              <button class="vw-nav__trigger" type="button" aria-expanded="false">
+                Service
+                <svg class="vw-nav__chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+              <div class="vw-nav__panel">
+                <a class="vw-nav__suba" href="/ausfluege"><b>Ausflüge</b></a>
+                <a class="vw-nav__suba" href="/links"><b>Links</b></a>
+              </div>
+            </div>
+            <div class="vw-nav__item"><a class="vw-nav__trigger" href="/kontakt">Kontakt</a></div>
+          </div>
+          <button type="button" class="vw-btn vw-btn--primary">Stelle melden <i data-lucide="map-pin" width="16" height="16"></i></button>
+        </div>
+      </div>
+    </header>
+  </div>
+  <p class="sg-note">Verkleinern Sie das Fenster unter 960px, um den Burger/Drawer statt der Hover-Dropdowns zu sehen.</p>
+
+  <div style="margin-top:24px;">
+    <div style="font:600 11px var(--font-body);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-muted);margin-bottom:10px;">Logo-Aufbau</div>
+    <div style="display:flex;align-items:center;gap:32px;flex-wrap:wrap;">
+      <a href="#" class="vw-logo" style="pointer-events:none;">
+        <span class="vw-logo__bar"></span>
+        <span class="vw-logo__text"><span class="vw-logo__top">velofreundliches</span><span class="vw-logo__bottom">WETZIKON</span></span>
+      </a>
+      <div style="font:400 12px var(--font-body);color:var(--color-muted);">
+        Bar: <code>6×36px · #dc3406 · border-radius:1px</code><br>
+        Top: <code>Jost 500 · 12px · letter-spacing:0.01em</code><br>
+        Bottom: <code>Jost 700 · 15px · letter-spacing:0.16em</code><br>
+        Margin-right: <code>24px</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="sg-section" id="events">
+  <div class="sg-section__title">Struktur <span>event_upcoming.html.twig · event_list.html.twig</span></div>
+  <div class="sg-h">Veranstaltungs-Karten <span class="sg-badge sg-badge--live" style="vertical-align:2px;margin-left:8px;">repräsentativ</span></div>
+  <div class="sg-preview--white">
+    <div class="vw-event-list">
+      <div class="vw-event">
+        <div class="vw-event__date"><span class="vw-event__day">14</span><span class="vw-event__month">Jun</span></div>
+        <div class="vw-event__body">
+          <a href="#" class="vw-event__title">Velotour durch Wetzikon — Problemstellen live erleben</a>
+          <div class="vw-event__meta">
+            <span class="vw-event__meta-item"><i data-lucide="clock" width="13" height="13"></i> 10:00 Uhr</span>
+            <span class="vw-event__meta-item"><i data-lucide="map-pin" width="13" height="13"></i> Bahnhof Wetzikon</span>
+            <span class="vw-tag vw-tag--primary">Velotour</span>
+          </div>
+        </div>
+        <div class="vw-event__actions"><a href="#" class="vw-btn vw-btn--ghost vw-btn--sm">Details</a></div>
+      </div>
+      <div class="vw-event">
+        <div class="vw-event__date"><span class="vw-event__day">28</span><span class="vw-event__month">Jun</span></div>
+        <div class="vw-event__body">
+          <a href="#" class="vw-event__title">Mitgliederversammlung 2026</a>
+          <div class="vw-event__meta">
+            <span class="vw-event__meta-item"><i data-lucide="clock" width="13" height="13"></i> 19:30 Uhr</span>
+            <span class="vw-event__meta-item"><i data-lucide="map-pin" width="13" height="13"></i> Gemeindesaal</span>
+            <span class="vw-tag vw-tag--neutral">Vereins-Event</span>
+          </div>
+        </div>
+        <div class="vw-event__actions"><a href="#" class="vw-btn vw-btn--ghost vw-btn--sm">Details</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="sg-section" id="news">
+  <div class="sg-section__title">Struktur <span>news_latest.html.twig · news_short.html.twig</span></div>
+  <div class="sg-h">News-Karten <span class="sg-badge sg-badge--live" style="vertical-align:2px;margin-left:8px;">repräsentativ</span></div>
+  <div class="sg-preview--white">
+    <div class="vw-news" style="grid-template-columns:1fr 1fr 1fr;">
+      <div class="vw-news__card">
+        <div class="vw-news__img" style="background:#e8e6e0;height:160px;display:flex;align-items:center;justify-content:center;color:#999;font:400 12px var(--font-body);">Beitragsbild 16:9</div>
+        <div class="vw-news__body">
+          <div class="vw-news__meta"><span class="vw-news__date">10. Juni 2026</span><span class="vw-tag vw-tag--primary">Stellungnahme</span></div>
+          <a href="#" class="vw-news__title">Neue Velostrategie des Kantons — unsere Einschätzung</a>
+          <p class="vw-news__teaser">Der Kanton Zürich hat seine Velostrategie 2030 vorgelegt. Wir haben sie analysiert und kommentiert.</p>
+          <a href="#" class="vw-news__link">Weiterlesen <i data-lucide="arrow-right" width="14" height="14"></i></a>
+        </div>
+      </div>
+      <div class="vw-news__card">
+        <div class="vw-news__img" style="background:#e8e6e0;height:160px;display:flex;align-items:center;justify-content:center;color:#999;font:400 12px var(--font-body);">Beitragsbild 16:9</div>
+        <div class="vw-news__body">
+          <div class="vw-news__meta"><span class="vw-news__date">3. Mai 2026</span><span class="vw-tag vw-tag--neutral">Bericht</span></div>
+          <a href="#" class="vw-news__title">Velotest: Neue Lastenräder im Vergleich</a>
+          <p class="vw-news__teaser">Wir haben fünf Lastenräder unter Wetzikoner Bedingungen getestet.</p>
+          <a href="#" class="vw-news__link">Weiterlesen <i data-lucide="arrow-right" width="14" height="14"></i></a>
+        </div>
+      </div>
+      <div class="vw-news__card">
+        <div class="vw-news__img" style="background:#e8e6e0;height:160px;display:flex;align-items:center;justify-content:center;color:#999;font:400 12px var(--font-body);">Beitragsbild 16:9</div>
+        <div class="vw-news__body">
+          <div class="vw-news__meta"><span class="vw-news__date">18. April 2026</span><span class="vw-tag vw-tag--success">Erfolg</span></div>
+          <a href="#" class="vw-news__title">Neue Velostreifen auf der Bahnhofstrasse</a>
+          <p class="vw-news__teaser">Nach zwei Jahren Einsatz wurden die Velostreifen offiziell eingeweiht.</p>
+          <a href="#" class="vw-news__link">Weiterlesen <i data-lucide="arrow-right" width="14" height="14"></i></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MODAL -->
+<section class="sg-section" id="modal">
+  <div class="sg-section__title">Struktur <span>page/layout/velo.html.twig · #modal-melde</span></div>
+  <div class="sg-h">Modal (Stelle melden)</div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">Das Modal ist global im Layout-Template definiert (nicht als eigenes Contao-Element). Es wird per JS geöffnet: <code>document.getElementById('modal-melde').classList.add('open')</code> — verfügbar auf jeder Seite. Form-Einbettung via <code>insert_tag('insert_form::1')</code> (tl_form ID 1 = VeloMelde-Formular).</div>
+  <div class="sg-preview--white" style="position:relative;min-height:340px;overflow:hidden;border-radius:8px;">
+    <div style="position:absolute;inset:0;background:rgba(0,0,0,0.45);display:flex;align-items:flex-end;justify-content:center;padding-bottom:0;">
+      <div class="modal" style="position:static;transform:none;width:auto;max-width:100%;border-radius:12px 12px 0 0;max-height:300px;display:flex;flex-direction:row;">
+        <div class="modal-left" style="overflow:hidden;">
+          <button class="modal-close"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="1" y1="1" x2="13" y2="13" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><line x1="13" y1="1" x2="1" y2="13" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></button>
+          <h2 class="modal-title">Stelle melden</h2>
+          <p style="font-size:14px;color:var(--color-text-muted);margin-bottom:16px;">Beschreiben Sie die gefährliche oder problematische Velostelle.</p>
+          <label class="field-label">Standort <span class="required">*</span></label>
+          <input type="text" placeholder="z.B. Kreuzung Bahnhofstrasse / Zürcherstrasse" style="margin-bottom:12px;">
+          <button class="vw-btn vw-btn--primary vw-btn--block">Meldung absenden <i data-lucide="send" width="16" height="16"></i></button>
+        </div>
+        <div class="modal-right" aria-hidden="true" style="display:flex !important;flex:0 0 220px;border-left:1px solid var(--color-border);">
+          <div style="padding:var(--space-5);height:100%;display:flex;flex-direction:column;gap:var(--space-4);">
+            <p style="font:600 var(--text-base) var(--font-display);color:#000;margin:0;">Ihre Meldung</p>
+            <p style="font:400 var(--text-sm) var(--font-body);color:var(--color-text-muted);">Eine Vorschau Ihrer Angaben erscheint hier während Sie das Formular ausfüllen.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="sg-note"><code>.modal-right</code> ist per CSS erst ab 900px sichtbar (<code>display:block !important</code>); hier für die Doku erzwungen dargestellt, damit die zweispaltige Desktop-Ansicht nicht fehlt. Aktuell nur statischer Platzhaltertext, keine echte Formular-Vorschau.</p>
+</section>
+
+</main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+
+  document.querySelectorAll('.sg-nav a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  /* ── Navigation demo: verbatim interaction logic from mod_navigation_accessible.html.twig ── */
+  (function () {
+    var navLinks = document.querySelector('#navigation .vw-nav__links');
+    if (navLinks) {
+      var dItems = Array.prototype.slice.call(navLinks.querySelectorAll('.vw-nav__item'));
+      function dCloseAll() {
+        dItems.forEach(function (i) {
+          i.classList.remove('is-open');
+          var t = i.querySelector('.vw-nav__trigger');
+          if (t && t.tagName === 'BUTTON') t.setAttribute('aria-expanded', 'false');
+        });
+      }
+      dItems.forEach(function (item) {
+        var trigger = item.querySelector('.vw-nav__trigger');
+        if (!trigger || trigger.tagName !== 'BUTTON') return;
+        trigger.addEventListener('click', function () {
+          var open = item.classList.contains('is-open');
+          dCloseAll();
+          if (!open) { item.classList.add('is-open'); trigger.setAttribute('aria-expanded', 'true'); }
+        });
+      });
+      document.addEventListener('click', function (e) {
+        if (!e.target.closest('#navigation .vw-nav__links')) dCloseAll();
+      });
+    }
+
+    var drawer = document.getElementById('sgDrawer');
+    var burger = document.getElementById('sgBurger');
+    if (drawer && burger) {
+      function openDrawer() {
+        drawer.classList.add('is-open'); drawer.setAttribute('aria-hidden', 'false');
+        burger.setAttribute('aria-expanded', 'true');
+      }
+      function closeDrawer() {
+        drawer.classList.remove('is-open'); drawer.setAttribute('aria-hidden', 'true');
+        burger.setAttribute('aria-expanded', 'false');
+      }
+      burger.addEventListener('click', openDrawer);
+      Array.prototype.slice.call(drawer.querySelectorAll('[data-drawer-close]')).forEach(function (el) {
+        el.addEventListener('click', closeDrawer);
+      });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeDrawer(); });
+    }
+
+    if (drawer) {
+      var mItems = Array.prototype.slice.call(drawer.querySelectorAll('.vw-nav__item'));
+      mItems.forEach(function (item) {
+        var trigger = item.querySelector('.vw-nav__trigger');
+        if (!trigger || trigger.tagName !== 'BUTTON') return;
+        trigger.addEventListener('click', function () {
+          var open = item.classList.contains('is-open');
+          mItems.forEach(function (a) {
+            a.classList.remove('is-open');
+            var t = a.querySelector('.vw-nav__trigger');
+            if (t) t.setAttribute('aria-expanded', 'false');
+          });
+          if (!open) { item.classList.add('is-open'); trigger.setAttribute('aria-expanded', 'true'); }
+        });
+      });
+    }
+  })();
+});
+</script>
+</body>
+</html>

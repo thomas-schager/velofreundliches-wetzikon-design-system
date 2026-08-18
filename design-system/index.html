@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@600;700&family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  body {
+    margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-body); background: var(--color-background); color: var(--color-text);
+  }
+  .wrap { max-width: 560px; padding: 48px 32px; }
+  h1 { font-family: var(--font-display); font-weight: 700; font-size: 32px; margin: 0 0 12px; letter-spacing: var(--tracking-tight); }
+  p { color: var(--color-text-muted); line-height: 1.6; margin: 0 0 28px; }
+  .links { display: flex; flex-direction: column; gap: 12px; }
+  a.card {
+    display: block; padding: 18px 20px; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+    text-decoration: none; color: var(--color-text); transition: border-color 180ms, box-shadow 180ms;
+  }
+  a.card:hover { border-color: var(--color-primary); box-shadow: var(--shadow-md); }
+  a.card b { font-family: var(--font-display); font-weight: 600; color: var(--color-primary); display: block; margin-bottom: 4px; }
+  a.card span { font-size: 14px; color: var(--color-text-muted); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Design System</h1>
+    <p>Human-readable reference for velofreundliches-wetzikon-design-tokens, generated from
+       <code>../tokens.css</code> and a snapshot of the live Contao site's component CSS.</p>
+    <div class="links">
+      <a class="card" href="tokens.html"><b>Design Tokens</b><span>Farben, Typografie, Abstände, Radien, Schatten, Layout, Motion</span></a>
+      <a class="card" href="contao-implementation.html"><b>Contao-Implementierung</b><span>Buttons, Karten, Formulare, velo_* Content-Elemente, Navigation, Events, News, Modal</span></a>
+    </div>
+  </div>
+</body>
+</html>
