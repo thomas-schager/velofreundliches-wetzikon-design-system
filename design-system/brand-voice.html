@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sprache &amp; Prinzipien — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="_site-snapshot.css">
+<style>
+/* This page's own shell only -- .vw-footer preview below comes from _site-snapshot.css, tokens
+   from ../tokens.css. Everything else (voice/language/UX guidance) is prose, not live-sourced --
+   migrated by hand from claude-design-specs/design-system-summary.md in VeloWetzikon_Contao,
+   which documented it before this repo existed. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: var(--tracking-tight); }
+
+.sg-wrap { display: flex; min-height: 100vh; }
+.sg-sidebar { width: 224px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; background: #0d0d0d; padding: 0 0 32px; z-index: 200; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+.sg-sidebar__head { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sg-sidebar__title { font: 700 14px var(--font-display); color: #fff; display: block; }
+.sg-sidebar__sub   { font: 400 11px var(--font-body); color: rgba(255,255,255,0.35); margin-top: 2px; display: block; }
+.sg-nav-group { margin-bottom: 2px; }
+.sg-nav-section { padding: 14px 20px 4px; font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+.sg-nav a { display: block; padding: 5px 20px 5px 28px; font: 400 12px var(--font-body); color: rgba(255,255,255,0.55); text-decoration: none; transition: color 120ms, background 120ms; border-left: 2px solid transparent; }
+.sg-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--color-primary); }
+.sg-nav a.sg-nav-crosslink { color: var(--color-primary); font-weight: 500; }
+
+.sg-main { margin-left: 224px; flex: 1; max-width: 1200px; }
+.sg-section { padding: 48px 48px 56px; border-bottom: 1px solid var(--color-border); }
+.sg-section:last-child { border-bottom: none; }
+.sg-section__title { font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 12px; margin-bottom: 28px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; }
+.sg-section__title span { font: 400 11px var(--font-body); text-transform: none; letter-spacing: 0; color: var(--color-border-strong); font-family: monospace; }
+.sg-h { font: 600 22px/1.2 var(--font-display); margin: 0 0 28px; }
+.sg-intro { font: 400 15px/1.6 var(--font-body); color: var(--color-text-muted); max-width: 720px; margin: -8px 0 32px; }
+
+.sg-component { margin-bottom: 36px; }
+.sg-component__labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.sg-badge { font: 500 11px/1 var(--font-body); font-family: monospace; border-radius: 3px; padding: 3px 7px; display: inline-block; }
+.sg-badge--label { font: 600 11px var(--font-body); color: var(--color-muted); font-family: inherit; background: none; border: none; padding: 0; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; }
+.sg-badge--live { background: #fff4e5; border: 1px solid #f5c877; color: #8a5a00; }
+
+.sg-preview { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--white { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--fullbleed { border-radius: 8px; overflow: hidden; border: 1px solid var(--color-border); }
+.sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+
+.sg-quote {
+  border-left: 3px solid var(--color-primary); background: var(--color-primary-tint);
+  padding: 14px 20px; border-radius: 0 8px 8px 0; margin: 14px 0;
+  font: 400 15px/1.6 var(--font-body); color: #7a2b00;
+}
+.sg-quote strong { color: #4a1a00; font-family: var(--font-display); font-weight: 600; }
+
+.sg-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+@media (max-width: 700px) { .sg-2col { grid-template-columns: 1fr; } }
+.sg-list-dont, .sg-list-do { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.sg-list-dont li, .sg-list-do li { display: flex; gap: 10px; font: 400 14px/1.5 var(--font-body); align-items: flex-start; }
+.sg-list-dont li::before { content: "✕"; color: var(--color-danger); font-weight: 700; flex-shrink: 0; }
+.sg-list-do li::before { content: "✓"; color: var(--color-success); font-weight: 700; flex-shrink: 0; }
+
+.sg-icon-row { display: flex; flex-wrap: wrap; gap: 20px; }
+.sg-icon-chip { display: flex; flex-direction: column; align-items: center; gap: 8px; width: 72px; }
+.sg-icon-chip svg, .sg-icon-chip i { color: var(--color-primary); }
+.sg-icon-chip span { font: 400 11px var(--font-body); color: var(--color-muted); font-family: monospace; text-align: center; }
+
+.sg-ux-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.sg-ux-card { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 20px 22px; }
+.sg-ux-card h4 { font: 600 14px var(--font-display); margin-bottom: 10px; }
+.sg-ux-card ul { margin: 0; padding-left: 18px; font: 400 13px/1.6 var(--font-body); color: var(--color-text-muted); }
+.sg-ux-card ul li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+
+<aside class="sg-sidebar">
+  <div class="sg-sidebar__head">
+    <span class="sg-sidebar__title">Sprache &amp; Prinzipien</span>
+    <span class="sg-sidebar__sub">Velofreundliches Wetzikon</span>
+  </div>
+  <nav class="sg-nav">
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Haltung &amp; Sprache</span>
+      <a href="#haltung">Haltung &amp; Zielgruppe</a>
+      <a href="#sprache">Sprache &amp; Copy</a>
+      <a href="#donts-dos">Don'ts / Do's</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Visuelle Prinzipien</span>
+      <a href="#iconography">Iconography</a>
+      <a href="#imagery">Bildsprache</a>
+      <a href="#footer">Footer</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">UX</span>
+      <a href="#ux-guidelines">UX-Richtlinien (Formulare/Modals)</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Diese Doku-Seite</span>
+      <a href="tokens.html" class="sg-nav-crosslink">→ Design Tokens</a>
+      <a href="contao-implementation.html" class="sg-nav-crosslink">→ Contao-Implementierung</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="sg-main">
+
+<section class="sg-section" id="intro">
+  <div class="sg-section__title">Über diese Seite <span>velofreundliches-wetzikon-design-system</span></div>
+  <div class="sg-h">Sprache &amp; Prinzipien</div>
+  <p class="sg-intro">
+    Diese Seite ergänzt <a href="tokens.html" style="color:var(--color-primary);">Design Tokens</a>
+    und <a href="contao-implementation.html" style="color:var(--color-primary);">Contao-Implementierung</a>
+    um das, was sich nicht als CSS-Variable oder Markup ausdrücken lässt: Tonalität, Sprachregeln,
+    Bildsprache und UX-Prinzipien. Diese Inhalte ändern sich selten und sind bewusst als Prosa
+    dokumentiert statt als Code-Referenz — wer Copy schreibt oder eine neue Komponente entwirft,
+    soll hier die Haltung dahinter finden, nicht nur die Werte.
+  </p>
+</section>
+
+<!-- HALTUNG -->
+<section class="sg-section" id="haltung">
+  <div class="sg-section__title">Haltung &amp; Sprache</div>
+  <div class="sg-h">Haltung &amp; Zielgruppe</div>
+  <p style="max-width:680px;margin-bottom:16px;">
+    <strong>Velofreundliches Wetzikon</strong> ist eine zivilgesellschaftliche Interessengemeinschaft
+    in Wetzikon (Kanton Zürich). Sie setzt sich für velofreundliche Verkehrsplanung, sichere
+    Schulwege und eine durchgängige Veloinfrastruktur ein.
+  </p>
+  <p style="max-width:680px;margin-bottom:16px;"><strong>Zielgruppe:</strong> Erwachsene Wohnbevölkerung, Stimmberechtigte, lokale Politik, Stadtplanung.</p>
+  <ul style="max-width:680px;padding-left:20px;line-height:1.7;">
+    <li>Professionell, aber leichtgewichtig.</li>
+    <li>Bürgerlich-sachlich, nicht korporativ.</li>
+    <li><strong>Kein Öko-Lifestyle, kein Sport-Cycling, kein NGO-Pathos.</strong> Velo ist hier Verkehrsmittel und Stadtpolitik, kein Lebensgefühl.</li>
+    <li>Tonalität: gut informierter, engagierter Bürger — irgendwo zwischen Quartierverein und Policy Brief.</li>
+  </ul>
+</section>
+
+<!-- SPRACHE & COPY -->
+<section class="sg-section" id="sprache">
+  <div class="sg-section__title">Haltung &amp; Sprache <span>Copy-Regeln</span></div>
+  <div class="sg-h">Sprache &amp; Copy</div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Sprache</span></div>
+    <ul style="padding-left:20px;line-height:1.8;">
+      <li><strong>Schweizer Hochdeutsch.</strong></li>
+      <li><strong>Niemals „ß"</strong> — immer „ss". <code>Strasse</code>, nicht <code>Straße</code>. Nicht verhandelbar.</li>
+      <li><strong>„Velo"</strong> statt „Fahrrad" oder „Bike" — Schweizerischer Standardbegriff, im Vereinsnamen verankert.</li>
+      <li>Allgemeines Publikum mit <strong>„Sie"</strong> ansprechen; <strong>„Du"</strong> nur in klar informellen Kontexten (Mitglieder-Event-Einladungen).</li>
+      <li>Schweizer Konventionen: Tausendertrennzeichen <code>1'500</code> · Prozent <code>27.5&nbsp;%</code> · Datum <code>15.03.2026</code> / <code>15. März 2026</code> · Währung <code>CHF 30</code>.</li>
+    </ul>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Voice</span></div>
+    <ul style="padding-left:20px;line-height:1.8;">
+      <li><strong>Konkret und faktisch.</strong> Strassen, Knoten, Pläne, Zahlen — keine abstrakten „Lösungen", „Erlebnisse", „Visionen".</li>
+      <li><strong>Sachlich-pointiert.</strong> Es werden Positionen vertreten, Absätze dürfen 3–5 Sätze Substanz haben.</li>
+      <li><strong>„Wir"</strong> für den Verein, <strong>„Sie" / „die Stadt"</strong> für die Stadtverwaltung. Niemals werbliches „uns" („joine uns") — Mitgliedschaft heisst, eine Sache zu unterstützen, nicht eine Marke.</li>
+      <li>Headlines: Satzanfang gross, keine durchgehenden Versalien.</li>
+      <li>Buttons: Satzanfang gross — „Mitglied werden", nicht „MITGLIED WERDEN".</li>
+      <li><strong>Keine Emoji.</strong> UI-Affordances werden mit Icons (Lucide) gelöst.</li>
+    </ul>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Beispiele</span></div>
+    <div class="sg-quote"><strong>Sichere Velowege für Wetzikon.</strong><br>Wir setzen uns dafür ein, dass das Velo in Wetzikon ein selbstverständliches und sicheres Verkehrsmittel wird — für alle Altersgruppen, auf jedem Schulweg, auf jeder Einkaufsroute.</div>
+    <div class="sg-quote"><strong>Stellungnahme zum Verkehrsrichtplan 2026.</strong><br>Der vorliegende Entwurf greift in zentralen Punkten zu kurz. Wir fordern eine durchgehende Veloachse zwischen Bahnhof und Kempten sowie eine verbindliche Velo-Vorrangregelung an den Knoten Bahnhofstrasse / Usterstrasse.</div>
+    <div class="sg-quote"><strong>Mitglied werden — 30 Franken im Jahr.</strong><br>Mit Ihrem Beitrag finanzieren wir Stellungnahmen, Veranstaltungen und die Arbeit vor Ort.</div>
+  </div>
+</section>
+
+<!-- DON'TS / DO'S -->
+<section class="sg-section" id="donts-dos">
+  <div class="sg-section__title">Haltung &amp; Sprache <span>Schnellreferenz</span></div>
+  <div class="sg-h">Don'ts / Do's</div>
+  <div class="sg-2col">
+    <div>
+      <div style="font:600 11px var(--font-body);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-danger);margin-bottom:12px;">Vermeiden</div>
+      <ul class="sg-list-dont">
+        <li>„ß" — immer „ss"</li>
+        <li>„Fahrrad" / „Bike" — immer „Velo"</li>
+        <li>Emoji</li>
+        <li>Verläufe, Glasmorphismus</li>
+        <li>Blatt-/Erd-/Öko-Ikonografie</li>
+        <li>Reine ALL-CAPS-Headlines</li>
+        <li>Bouncy/spring-y Motion</li>
+        <li>Schwere Drop-Shadows</li>
+        <li>Mountainbike-/Sport-Vokabular</li>
+        <li>Ikonografische SVGs für Hero-Bilder — echte Fotografie verwenden</li>
+      </ul>
+    </div>
+    <div>
+      <div style="font:600 11px var(--font-body);text-transform:uppercase;letter-spacing:0.06em;color:var(--color-success);margin-bottom:12px;">Anwenden</div>
+      <ul class="sg-list-do">
+        <li>Eine Akzentfarbe (<code>--color-primary</code>), selbstbewusst eingesetzt</li>
+        <li>Jost für Headlines, Roboto für Body</li>
+        <li>Warm-neutrale Off-White-Hintergründe</li>
+        <li>Lucide-Icons mit 1.5px Stroke</li>
+        <li>Klare Editorial-Hierarchie: Eyebrow → H2 → Lead → Body</li>
+        <li>Campaign-Cards mit 3px orangem Top-Border</li>
+        <li>Status-Pills mit kleinem farbigem Dot</li>
+        <li>Swiss-formatierte Zahlen, Daten, Währungen</li>
+        <li>„Sie"-Form, ausser bei expliziten Mitglieder-Kontexten</li>
+        <li>Foto realistisch, dokumentarisch, lokal</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ICONOGRAPHY -->
+<section class="sg-section" id="iconography">
+  <div class="sg-section__title">Visuelle Prinzipien</div>
+  <div class="sg-h">Iconography</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    <a href="https://lucide.dev" style="color:var(--color-primary);">Lucide-Icons</a> via CDN oder NPM.
+    Stroke-Stil: <strong>1.5px</strong>, <code>stroke-linecap: round</code>, <code>stroke-linejoin: round</code>,
+    <code>fill: none</code>, Farbe via <code>currentColor</code>. Grössen: <strong>16 / 20 / 24 / 32px</strong>.
+    Icons folgen der Textfarbe; Akzent in Primary nur bei isolierten Bedeutungsträgern (Pfeil, Erfolg).
+    Custom Velo-/Infrastruktur-Icons halten denselben Stil: 24×24 viewBox, 1.5px Stroke, runde Caps &amp; Joins.
+  </p>
+  <div class="sg-preview--white">
+    <div class="sg-icon-row">
+      <div class="sg-icon-chip"><i data-lucide="bike" width="24" height="24"></i><span>bike</span></div>
+      <div class="sg-icon-chip"><i data-lucide="map-pin" width="24" height="24"></i><span>map-pin</span></div>
+      <div class="sg-icon-chip"><i data-lucide="calendar" width="24" height="24"></i><span>calendar</span></div>
+      <div class="sg-icon-chip"><i data-lucide="file-text" width="24" height="24"></i><span>file-text</span></div>
+      <div class="sg-icon-chip"><i data-lucide="message-square" width="24" height="24"></i><span>message-square</span></div>
+      <div class="sg-icon-chip"><i data-lucide="users" width="24" height="24"></i><span>users</span></div>
+      <div class="sg-icon-chip"><i data-lucide="arrow-right" width="24" height="24"></i><span>arrow-right</span></div>
+      <div class="sg-icon-chip"><i data-lucide="clock" width="24" height="24"></i><span>clock</span></div>
+      <div class="sg-icon-chip"><i data-lucide="mail" width="24" height="24"></i><span>mail</span></div>
+      <div class="sg-icon-chip"><i data-lucide="check" width="24" height="24"></i><span>check</span></div>
+      <div class="sg-icon-chip"><i data-lucide="info" width="24" height="24"></i><span>info</span></div>
+      <div class="sg-icon-chip"><i data-lucide="alert-circle" width="24" height="24"></i><span>alert-circle</span></div>
+      <div class="sg-icon-chip"><i data-lucide="download" width="24" height="24"></i><span>download</span></div>
+    </div>
+  </div>
+  <p class="sg-note">Keine Emoji — jede UI-Affordance, die nach einem Symbol verlangt, bekommt eines dieser Icons statt eines Emoji.</p>
+</section>
+
+<!-- IMAGERY -->
+<section class="sg-section" id="imagery">
+  <div class="sg-section__title">Visuelle Prinzipien</div>
+  <div class="sg-h">Bildsprache</div>
+  <ul style="max-width:680px;padding-left:20px;line-height:1.8;">
+    <li><strong>Dokumentarisch, Tageslicht, real lokal.</strong></li>
+    <li>Motive: Menschen auf dem Velo (Erwachsene mit Helm, Familien, Pendler — keine Stock-Athleten), Strasseninfrastruktur (Knoten, Markierungen, Schilder), zivile Settings (Stadtratssitzung, Begehung).</li>
+    <li><strong>Vermeiden:</strong> Drohnenaufnahmen, Mountainbike, Rennrad, Produktshots — alles, was wie Velohersteller-Werbung wirkt.</li>
+    <li>Behandlung: natürlich, ohne starke Filter; ein leichter warmer Ton zur Vereinheitlichung ist erlaubt.</li>
+  </ul>
+</section>
+
+<!-- FOOTER -->
+<section class="sg-section" id="footer">
+  <div class="sg-section__title">Visuelle Prinzipien <span>site.css · .vw-footer</span></div>
+  <div class="sg-h">Footer</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--live" style="vertical-align:1px;">Live aus localhost:8000/ übernommen, 2026-08-19</span>
+  </div>
+  <p style="max-width:680px;margin-bottom:16px;">
+    Vier Spalten ab 960px (<code>.vw-footer__grid</code>: <code>2fr 1fr 1fr 1fr</code>), zwei Spalten
+    ab 600px, eine Spalte darunter. Hintergrund <code>#000</code>, Text weiss. Spalten-Überschriften
+    <code>Jost 600 14px</code> mit 1px Unter-Border. Link-Farbe <code>rgba(255,255,255,0.75)</code>,
+    ohne Underline. Bottom-Bar mit Copyright + Impressum/Datenschutz in <code>rgba(255,255,255,0.5)</code>.
+    Der Footer-<strong>Inhalt</strong> (Spalten, Links) ist statisch im Template hinterlegt, nicht CMS-editierbar.
+  </p>
+  <div class="sg-preview--fullbleed">
+    <footer class="vw-footer">
+      <div class="vw-footer__inner">
+        <div class="vw-footer__grid">
+          <div class="vw-footer__col">
+            <a href="#" class="vw-logo" style="pointer-events:none;">
+              <span class="vw-logo__bar"></span>
+              <span class="vw-logo__text"><span class="vw-logo__top">velofreundliches</span><span class="vw-logo__bottom">WETZIKON</span></span>
+            </a>
+            <p class="vw-footer__about">Private Initiative für ein velofreundliches Wetzikon. Wir vertreten die Anliegen der Velofahrenden gegenüber Stadt, Kanton, Firmen und Öffentlichkeit.</p>
+            <a href="#" class="vw-footer__mail" style="pointer-events:none;"><i data-lucide="mail" width="16" height="16"></i> feedback@velofreundliches-wetzikon.ch</a>
+          </div>
+          <div class="vw-footer__col">
+            <span class="vw-footer__col-heading">Themen</span>
+            <ul class="vw-footer__links">
+              <li><a href="#">Veloinfrastruktur</a></li>
+              <li><a href="#">Schulweg</a></li>
+              <li><a href="#">Verkehrsplanung</a></li>
+              <li><a href="#">Velo&shy;abstellplätze</a></li>
+            </ul>
+          </div>
+          <div class="vw-footer__col">
+            <span class="vw-footer__col-heading">Engagement</span>
+            <ul class="vw-footer__links">
+              <li><a href="#">Mitglied werden</a></li>
+              <li><a href="#">Spenden</a></li>
+              <li><a href="#">Newsletter</a></li>
+              <li><a href="#">Veranstaltungen</a></li>
+            </ul>
+          </div>
+          <div class="vw-footer__col">
+            <span class="vw-footer__col-heading">Verein</span>
+            <ul class="vw-footer__links">
+              <li><a href="#">Vorstand</a></li>
+              <li><a href="#">Statuten</a></li>
+              <li><a href="#">Jahresbericht</a></li>
+              <li><a href="#">Medienmitteilungen</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="vw-footer__bar">
+          <div>&copy; 2026 Velofreundliches Wetzikon</div>
+          <div class="vw-footer__legal"><a href="#">Impressum</a><a href="#">Datenschutz</a></div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</section>
+
+<!-- UX-RICHTLINIEN -->
+<section class="sg-section" id="ux-guidelines">
+  <div class="sg-section__title">UX <span>ursprünglich für die VeloMelde-Modals entwickelt, gelten projektweit</span></div>
+  <div class="sg-h">UX-Richtlinien (Formulare/Modals)</div>
+  <p style="max-width:680px;margin-bottom:24px;">
+    Diese Prinzipien entstanden bei der VeloMelde-Karte (Mai 2026), gelten aber für jedes
+    Formular/Modal im Projekt — nicht nur das Melde-Modal.
+  </p>
+  <div class="sg-ux-grid">
+    <div class="sg-ux-card">
+      <h4>Touch-Flächen</h4>
+      <ul>
+        <li>Alle interaktiven Elemente: <code>min-height: 44px</code> (Apple HIG)</li>
+        <li>Ausnahme: Karten-interne UI-Chrome-Toggles, <code>min-height: 36px</code> akzeptabel</li>
+        <li>Schliessen-Button: 32×32px genügt (oben rechts, gut erreichbar)</li>
+      </ul>
+    </div>
+    <div class="sg-ux-card">
+      <h4>Barrierefreiheit</h4>
+      <ul>
+        <li><code>role="dialog"</code> + <code>aria-modal="true"</code> auf dem Modal-Container</li>
+        <li><code>aria-labelledby</code> verweist auf die Titel-<code>id</code></li>
+        <li>Bewertungsgruppen in <code>&lt;fieldset&gt;</code> + <code>&lt;legend&gt;</code>, nicht <code>&lt;label&gt;</code></li>
+        <li>Fehlermeldungen: <code>role="alert"</code></li>
+        <li>Live-Bereiche (Adresse, Zeichenzähler): <code>aria-live="polite"</code></li>
+        <li>Schliessen per ESC-Taste</li>
+      </ul>
+    </div>
+    <div class="sg-ux-card">
+      <h4>Validierung</h4>
+      <ul>
+        <li><strong>Nie</strong> <code>disabled</code> auf dem Absende-Button — immer klickbar</li>
+        <li>Inline-Validierung erst nach <code>blur</code>, nicht bei <code>input</code></li>
+        <li>Beim Absenden: alle Fehler gleichzeitig, Fokus auf erstes fehlerhaftes Feld</li>
+        <li><code>aria-describedby</code> verbindet Input mit Zeichenzähler/Fehlermeldung</li>
+      </ul>
+    </div>
+    <div class="sg-ux-card">
+      <h4>Mobile-spezifisch</h4>
+      <ul>
+        <li>Bottom Sheet: <code>translateY(100%)</code> → <code>translateY(0)</code></li>
+        <li>Scrollbarer Formular-Container: <code>-webkit-overflow-scrolling: touch</code></li>
+        <li>Bei Focus: <code>scrollIntoView</code> auf dem Container (nicht <code>window</code>), ~120ms Verzögerung für Keyboard-Animation</li>
+        <li><code>visualViewport.resize</code> für Nachkorrektur abfangen</li>
+        <li><code>inputmode="email"</code> / <code>inputmode="numeric"</code> je nach Feldtyp</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  document.querySelectorAll('.sg-nav a[href^="#"]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      var target = document.querySelector(this.getAttribute('href'));
+      if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+});
+</script>
+</body>
+</html>

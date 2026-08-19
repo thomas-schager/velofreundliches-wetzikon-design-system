@@ -11,7 +11,7 @@ Consumers today:
   (`public/additions/velo-melder.html`, local `--vw-*`-prefixed mirror of the same values).
 - The backend/admin app (Symfony/Laravel) — not yet created.
 
-See `../VeloWetzikon_Contao/claude-design-specs/design-system-sharing-strategy.md` for the full
+See [`design-system-sharing-strategy.md`](design-system-sharing-strategy.md) for the full
 reasoning behind this repo's existence and the sync approach.
 
 ## What's here
