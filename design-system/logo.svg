@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 36" width="210" height="36" role="img" aria-label="Velofreundliches Wetzikon">
+  <!--
+    Wordmark placeholder, matching the live .vw-logo/.vw-logo__bar/.vw-logo__text/.vw-logo__top/
+    .vw-logo__bottom markup in VeloWetzikon_Contao's files/themes/velo/css/site.css exactly
+    (bar 6x36 #dc3406 radius 1, gap 10px, top line Jost 500 12px letter-spacing 0.01em, bottom
+    line Jost 700 14px letter-spacing 0.16em). This is the LIGHT/SURFACE variant (black text);
+    see logo-on-dark.svg for the dark-background variant. Both are approximations of the live
+    HTML/CSS component for contexts that need a flat image (e.g. favicons, social previews,
+    non-web documents); the canonical implementation is still the HTML/CSS version, not this
+    file. If a real logo replaces the wordmark, replace both SVGs too.
+
+    Deliberately no @font-face/@import for Jost here: embedded via <img> (a "static image"
+    context), Chrome silently fails to render an SVG whose <style> references a remote font at
+    all, rather than degrading gracefully to the fallback, so this uses plain presentation
+    attributes with a safe system-font fallback instead. Renders in Jost automatically only if
+    it's already loaded by the surrounding page (e.g. brand-voice.html, or the live site); an
+    <img>-embedded copy always falls back to bold Helvetica/Arial. Looks close, not identical.
+  -->
+  <rect x="0" y="0" width="6" height="36" rx="1" fill="#dc3406"/>
+  <text x="16" y="14" font-family="'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="500" font-size="12" letter-spacing="0.12" fill="#000000">velofreundliches</text>
+  <text x="16" y="30" font-family="'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="14" letter-spacing="2.24" fill="#000000">WETZIKON</text>
+</svg>

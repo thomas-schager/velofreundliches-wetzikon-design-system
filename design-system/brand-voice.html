@@ -78,6 +78,17 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: va
 .sg-ux-card h4 { font: 600 14px var(--font-display); margin-bottom: 10px; }
 .sg-ux-card ul { margin: 0; padding-left: 18px; font: 400 13px/1.6 var(--font-body); color: var(--color-text-muted); }
 .sg-ux-card ul li { margin-bottom: 4px; }
+
+.sg-rule-box {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: var(--danger-tint); border: 1px solid #e8b7a3; border-radius: 8px;
+  padding: 16px 20px; margin: 0 0 28px; max-width: 720px;
+}
+.sg-rule-box svg { color: var(--color-danger); flex-shrink: 0; margin-top: 2px; }
+.sg-rule-box strong { display: block; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #6b1d02; margin-bottom: 4px; }
+.sg-rule-box p { font: 400 13px/1.6 var(--font-body); color: #7a2b00; margin: 0; }
+.sg-rule-box ul { margin: 6px 0 0; padding-left: 18px; font: 400 13px/1.6 var(--font-body); color: #7a2b00; }
+.sg-rule-box ul li { margin-bottom: 2px; }
 </style>
 </head>
 <body>
@@ -98,6 +109,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: va
     <div class="sg-nav-group">
       <span class="sg-nav-section">Visuelle Prinzipien</span>
       <a href="#iconography">Iconography</a>
+      <a href="#logo">Logo</a>
       <a href="#imagery">Bildsprache</a>
       <a href="#footer">Footer</a>
     </div>
@@ -249,6 +261,130 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: va
     </div>
   </div>
   <p class="sg-note">Keine Emoji — jede UI-Affordance, die nach einem Symbol verlangt, bekommt eines dieser Icons statt eines Emoji.</p>
+</section>
+
+<!-- LOGO -->
+<section class="sg-section" id="logo">
+  <div class="sg-section__title">Visuelle Prinzipien <span>site.css · .vw-logo</span></div>
+  <div class="sg-h">Logo</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Die Wortmarke wird als <strong>HTML/CSS-Komponente</strong> gebaut, nicht als Bild eingebunden
+    — ein Textbalken (<code>.vw-logo__bar</code>) plus zweizeiliger Text
+    (<code>.vw-logo__text</code> → <code>.vw-logo__top</code>/<code>.vw-logo__bottom</code>),
+    verpackt in <code>&lt;a class="vw-logo"&gt;</code>. Das ist die kanonische Implementierung
+    (live in <code>site.css</code>) — für Kontexte, die ein flaches Bild statt Live-HTML brauchen
+    (Favicon, Social-Preview, E-Mail-Signatur, Print), liegen unten zwei passende SVG-Dateien.
+  </p>
+
+  <div class="sg-rule-box">
+    <i data-lucide="shield-alert" width="20" height="20"></i>
+    <div>
+      <strong>Die Wortmarke darf nicht verändert oder angepasst werden.</strong>
+      <p>
+        Weder die HTML/CSS-Komponente noch die beiden SVG-Dateien werden umgefärbt, gestreckt/
+        gestaucht, neu gesetzt, mit anderen Schriftschnitten kombiniert oder anderweitig
+        modifiziert — auch nicht für Kampagnen, Saisonales oder einzelne Seiten. Das gilt für:
+      </p>
+      <ul>
+        <li>Farben (Balken-Orange, Textfarbe hell/dunkel) — nur die zwei dokumentierten Varianten oben, keine dritte.</li>
+        <li>Proportionen — Balkenbreite/-höhe, Schriftgrössen, Letter-Spacing, Zeilenabstand exakt wie oben spezifiziert.</li>
+        <li>Zusammensetzung — Balken + zweizeiliger Text bleibt genau in dieser Anordnung, nicht einzeilig, nicht ohne Balken, keine Elemente dazwischen.</li>
+        <li>Wortlaut — „velofreundliches" / „WETZIKON", keine Kurzform, kein Zusatz-Claim direkt im Logo.</li>
+      </ul>
+      <p style="margin-top:6px;">
+        Ausnahme ist ausschliesslich ein vollständiger Ersatz durch ein neues, offiziell
+        beschlossenes Logo (siehe Platzhalter-Hinweis am Ende dieses Abschnitts) — das ist ein
+        bewusster Entscheid für die ganze Website, keine Datei-für-Datei-Anpassung.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Live-Rendering</span></div>
+    <div class="sg-row" style="gap:16px;">
+      <div class="sg-preview--white" style="padding:20px 24px;">
+        <a href="#" class="vw-logo" style="pointer-events:none;">
+          <span class="vw-logo__bar"></span>
+          <span class="vw-logo__text"><span class="vw-logo__top">velofreundliches</span><span class="vw-logo__bottom">WETZIKON</span></span>
+        </a>
+      </div>
+      <div class="sg-preview--dark" style="padding:20px 24px;">
+        <a href="#" class="vw-logo" style="pointer-events:none;">
+          <span class="vw-logo__bar"></span>
+          <span class="vw-logo__text"><span class="vw-logo__top">velofreundliches</span><span class="vw-logo__bottom">WETZIKON</span></span>
+        </a>
+      </div>
+    </div>
+    <p class="sg-note">Links: hell/Surface (Standard). Rechts: auf Dark — Text wird weiss, der Balken bleibt <code>--color-primary</code>.</p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Markup zum Kopieren</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre style="margin:0;font:400 12px/1.7 monospace;white-space:pre;">&lt;a href="/" class="vw-logo" aria-label="Velofreundliches Wetzikon — Startseite"&gt;
+  &lt;span class="vw-logo__bar" aria-hidden="true"&gt;&lt;/span&gt;
+  &lt;span class="vw-logo__text"&gt;
+    &lt;span class="vw-logo__top"&gt;velofreundliches&lt;/span&gt;
+    &lt;span class="vw-logo__bottom"&gt;WETZIKON&lt;/span&gt;
+  &lt;/span&gt;
+&lt;/a&gt;</pre>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Spezifikation</span></div>
+    <div class="sg-preview--white">
+      <div class="adm-kv-fallback" style="display:flex;flex-direction:column;gap:0;">
+        <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--color-border);font-size:13px;"><span style="color:var(--color-muted);">Balken (<code>.vw-logo__bar</code>)</span><span>6 × 36px · <code>--color-primary</code> · <code>border-radius: 1px</code></span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--color-border);font-size:13px;"><span style="color:var(--color-muted);">Abstand Balken → Text</span><span><code>gap: 10px</code></span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--color-border);font-size:13px;"><span style="color:var(--color-muted);">Zeile 1 (<code>.vw-logo__top</code>)</span><span>Jost 500 · 12px · <code>letter-spacing: 0.01em</code></span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--color-border);font-size:13px;"><span style="color:var(--color-muted);">Zeile 2 (<code>.vw-logo__bottom</code>)</span><span>Jost 700 · 14px (<code>--text-sm</code>) · <code>letter-spacing: 0.16em</code></span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid var(--color-border);font-size:13px;"><span style="color:var(--color-muted);">Zeilenhöhe Textblock</span><span><code>line-height: 1.15</code></span></div>
+        <div style="display:flex;justify-content:space-between;gap:16px;padding:9px 0;font-size:13px;"><span style="color:var(--color-muted);">Abstand zum nächsten Element</span><span><code>margin-right: 24px</code> (in der Navigation)</span></div>
+      </div>
+    </div>
+    <p class="sg-note">Korrigiert gegenüber einer früheren Version dieser Dokumentation, die Zeile 2 fälschlich mit 15px angab — der Wert ist <code>--text-sm</code>, also 14px, verifiziert gegen <code>site.css</code>.</p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label" style="color:#8a5a00;">Implementierungs-Detail</span></div>
+    <div class="sg-callout-box" style="margin:0;">
+      Die Dark-Variante (weisser Text) ist im Live-CSS aktuell nur für
+      <code>.vw-footer .vw-logo__top</code>/<code>.vw-logo__bottom</code> definiert — nicht als
+      generische <code>.vw-logo--on-dark</code>-Modifier-Klasse. Wer das Logo auf eine
+      <strong>neue</strong> dunkle Fläche ausserhalb des Footers setzt, muss die Farbüberschreibung
+      selbst ergänzen (oder besser: die Regel generalisieren), sonst erscheint der Text schwarz
+      auf dunklem Grund.
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels">
+      <span class="sg-badge sg-badge--label">SVG-Dateien</span>
+      <span class="sg-badge sg-badge--css">logo.svg</span>
+      <span class="sg-badge sg-badge--css">logo-on-dark.svg</span>
+    </div>
+    <p style="font-size:13px;color:var(--color-text-muted);max-width:680px;margin-bottom:14px;">
+      Für Kontexte ohne Live-HTML/CSS (Favicon, Social-Preview-Bild, E-Mail-Signatur, Print) —
+      Näherungen der HTML/CSS-Komponente, kein Ersatz dafür. Rendern mit Jost, wenn die Schrift
+      bereits von der umgebenden Seite geladen ist, sonst mit einem Fett-Sans-Fallback
+      (Helvetica/Arial) — bewusst ohne eigenes <code>@font-face</code>, weil ein per
+      <code>&lt;img&gt;</code> eingebundenes SVG mit externem Font-Import in Chrome gar nicht
+      rendert statt sauber auf den Fallback zurückzufallen.
+    </p>
+    <div class="sg-row" style="gap:16px;align-items:stretch;">
+      <div class="sg-preview--white" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
+        <img src="logo.svg" width="180" height="31" alt="Logo, helle Variante">
+        <code style="font-size:11px;color:var(--color-muted);">logo.svg</code>
+      </div>
+      <div class="sg-preview--dark" style="padding:16px 20px;display:flex;flex-direction:column;gap:10px;align-items:flex-start;">
+        <img src="logo-on-dark.svg" width="180" height="31" alt="Logo, dunkle Variante">
+        <code style="font-size:11px;color:rgba(255,255,255,0.5);">logo-on-dark.svg</code>
+      </div>
+    </div>
+  </div>
+
+  <p class="sg-note">⚠ Die Wortmarke ist im jetzigen System ein <strong>Platzhalter</strong>. Liegt ein echtes Logo vor, ersetzt es die Wortmarke direkt — HTML/CSS-Komponente und beide SVGs gleichermassen.</p>
 </section>
 
 <!-- IMAGERY -->

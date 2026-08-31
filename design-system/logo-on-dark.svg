@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 210 36" width="210" height="36" role="img" aria-label="Velofreundliches Wetzikon">
+  <!--
+    Dark-background variant: text goes white, the accent bar stays #dc3406. Matches
+    .vw-footer .vw-logo__top/.vw-logo__bottom's color override in site.css (currently the only
+    place in the live CSS this override is actually scoped to; see the Logo guideline in
+    brand-voice.html for why that matters if you reuse this on a new dark surface). This file has
+    a transparent background; place it over a dark fill yourself. See logo.svg's comment for why
+    there's no @font-face/@import here (breaks <img>-embedded rendering in Chrome).
+  -->
+  <rect x="0" y="0" width="6" height="36" rx="1" fill="#dc3406"/>
+  <text x="16" y="14" font-family="'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="500" font-size="12" letter-spacing="0.12" fill="#ffffff">velofreundliches</text>
+  <text x="16" y="30" font-family="'Jost', 'Helvetica Neue', Helvetica, Arial, sans-serif" font-weight="700" font-size="14" letter-spacing="2.24" fill="#ffffff">WETZIKON</text>
+</svg>
