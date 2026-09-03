@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Karten (Leaflet) — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+/* This page's own shell -- same sg-* pattern as brand-voice.html/contao-implementation.html.
+   The live map at the bottom actually loads Leaflet + the same tile URLs/pin markup documented
+   here, so drift between this page's prose and its own example is caught just by looking at it. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: var(--tracking-tight); }
+
+.sg-wrap { display: flex; min-height: 100vh; }
+.sg-sidebar { width: 224px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; background: #0d0d0d; padding: 0 0 32px; z-index: 200; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+.sg-sidebar__head { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sg-sidebar__title { font: 700 14px var(--font-display); color: #fff; display: block; }
+.sg-sidebar__sub   { font: 400 11px var(--font-body); color: rgba(255,255,255,0.35); margin-top: 2px; display: block; }
+.sg-nav-group { margin-bottom: 2px; }
+.sg-nav-section { padding: 14px 20px 4px; font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+.sg-nav a { display: block; padding: 5px 20px 5px 28px; font: 400 12px var(--font-body); color: rgba(255,255,255,0.55); text-decoration: none; transition: color 120ms, background 120ms; border-left: 2px solid transparent; }
+.sg-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--color-primary); }
+.sg-nav a.sg-nav-crosslink { color: var(--color-primary); font-weight: 500; }
+
+.sg-main { margin-left: 224px; flex: 1; max-width: 1200px; }
+.sg-section { padding: 48px 48px 56px; border-bottom: 1px solid var(--color-border); }
+.sg-section:last-child { border-bottom: none; }
+.sg-section__title { font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 12px; margin-bottom: 28px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; }
+.sg-section__title span { font: 400 11px var(--font-body); text-transform: none; letter-spacing: 0; color: var(--color-border-strong); font-family: monospace; }
+.sg-h { font: 600 22px/1.2 var(--font-display); margin: 0 0 28px; }
+.sg-intro { font: 400 15px/1.6 var(--font-body); color: var(--color-text-muted); max-width: 720px; margin: -8px 0 32px; }
+
+.sg-component { margin-bottom: 36px; }
+.sg-component__labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.sg-badge { font: 500 11px/1 var(--font-body); font-family: monospace; border-radius: 3px; padding: 3px 7px; display: inline-block; }
+.sg-badge--label { font: 600 11px var(--font-body); color: var(--color-muted); font-family: inherit; background: none; border: none; padding: 0; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; }
+.sg-badge--live { background: #fff4e5; border: 1px solid #f5c877; color: #8a5a00; }
+
+.sg-preview { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--white { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--fullbleed { border-radius: 8px; overflow: hidden; border: 1px solid var(--color-border); }
+.sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+
+.sg-rule-box {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: #eef2ff; border: 1px solid #a5b4fc; border-radius: 8px;
+  padding: 16px 20px; margin: 0 0 28px; max-width: 720px;
+}
+.sg-rule-box svg { color: #4338ca; flex-shrink: 0; margin-top: 2px; }
+.sg-rule-box strong { display: block; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #312e81; margin-bottom: 4px; }
+.sg-rule-box p { font: 400 13px/1.6 var(--font-body); color: #3730a3; margin: 0; }
+
+.sg-swatch-row { display: flex; flex-wrap: wrap; gap: 14px; }
+.sg-rate-chip { display: flex; align-items: center; gap: 8px; background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: var(--radius-full); padding: 6px 12px 6px 8px; font: 500 13px var(--font-body); }
+.sg-rate-chip__pin { width: 16px; height: 21px; flex-shrink: 0; }
+
+/* ---- Live map example ---- */
+#sg-map { height: 360px; width: 100%; cursor: default !important; }
+.sg-map-toggle {
+  position: absolute; top: 12px; right: 12px; z-index: 1000;
+  display: flex; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+  overflow: hidden; box-shadow: var(--shadow-md);
+}
+.sg-map-toggle-btn {
+  padding: 11px 14px; min-height: 44px; font-family: var(--font-body); font-size: 12px; font-weight: 500;
+  background: var(--color-surface); color: var(--color-text-muted); border: none; cursor: pointer;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease); white-space: nowrap;
+}
+.sg-map-toggle-btn + .sg-map-toggle-btn { border-left: 1px solid var(--color-border); }
+.sg-map-toggle-btn.active { background: var(--color-secondary); color: #fff; }
+.sg-map-toggle-btn:hover:not(.active) { background: var(--color-surface-2); color: var(--color-text); }
+.sg-custom-pin { width: 24px; height: 32px; }
+.sg-custom-pin svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22)); }
+.leaflet-popup-close-button { font-size: 16px !important; top: 8px !important; right: 10px !important; color: var(--color-muted) !important; }
+
+pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflow-x: auto; }
+code { font-family: monospace; background: var(--color-surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+
+<aside class="sg-sidebar">
+  <div class="sg-sidebar__head">
+    <span class="sg-sidebar__title">Karten (Leaflet)</span>
+    <span class="sg-sidebar__sub">Velofreundliches Wetzikon</span>
+  </div>
+  <nav class="sg-nav">
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Kartenstil</span>
+      <a href="#tiles">Kartenebenen</a>
+      <a href="#pins">Bewertungs-Pins</a>
+      <a href="#container">Container &amp; Steuerelemente</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Beispiel</span>
+      <a href="#live">Live-Karte</a>
+      <a href="#markup">Markup/CSS/JS zum Kopieren</a>
+      <a href="#usage">Wo verwendet</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Diese Doku-Seite</span>
+      <a href="tokens.html" class="sg-nav-crosslink">→ Design Tokens</a>
+      <a href="contao-implementation.html" class="sg-nav-crosslink">→ Contao-Implementierung</a>
+      <a href="brand-voice.html" class="sg-nav-crosslink">→ Sprache &amp; Prinzipien</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="sg-main">
+
+<section class="sg-section" id="intro">
+  <div class="sg-section__title">Über diese Seite <span>velofreundliches-wetzikon-design-system</span></div>
+  <div class="sg-h">Karten (Leaflet)</div>
+  <p class="sg-intro">
+    Jede Karte im Projekt — die VeloMelder-Hauptkarte und ihr Routen-Editor in
+    <code>velo-melder.html</code>, die öffentlichen Velonetz-Einbettungen
+    (<code>velo-velonetz-embed-3.html</code>) und die Meldungs-Prüfkarte im Admin-Backend — ist
+    <strong>Leaflet 1.9.4</strong> mit demselben Kartenstil, denselben Kachel-Anbietern und
+    denselben Pin-Markern. Diese Seite ist die kanonische Referenz für dieses "Look &amp; Feel";
+    <code>velo-melder.html</code> in <code>velofreundliches-wetzikon-contao</code> bleibt die
+    Quelle, aus der es hierher übertragen wurde (siehe <a href="#usage" style="color:var(--color-primary);">Wo verwendet</a>).
+  </p>
+
+  <div class="sg-rule-box">
+    <i data-lucide="info" width="20" height="20"></i>
+    <div>
+      <strong>Leaflet-Version fixieren.</strong>
+      <p>
+        Alle Kartenflächen laden Leaflet <code>1.9.4</code> von derselben CDN
+        (<code>cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/</code>). Eine neue Karte, die eine
+        andere Version oder einen anderen CDN-Host lädt, kann optisch/funktional abweichen
+        (Icon-Anchor-Berechnung, Popup-Layout) — beim Hinzufügen einer Karte immer diese Version
+        übernehmen, nicht "die neueste".
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="tiles">
+  <div class="sg-section__title">Kartenstil <span>L.tileLayer</span></div>
+  <div class="sg-h">Kartenebenen</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Zwei Ebenen, umschaltbar über den Stil-Toggle (siehe <a href="#container" style="color:var(--color-primary);">Container &amp; Steuerelemente</a>).
+    Strasse ist immer die Standardebene beim Laden.
+  </p>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Strasse (Standard)</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+  attribution: '&amp;copy; OpenStreetMap contributors &amp;copy; CARTO',
+  subdomains: 'abcd',
+  maxZoom: 19
+})</pre>
+    </div>
+    <p class="sg-note">CARTO Voyager — helle, reduzierte Farbgebung, damit Routen/Pins/Bänder die Aufmerksamkeit behalten (kein OSM-Standardstil mit lauten POI-Icons).</p>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Satellit (umschaltbar)</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+  attribution: '&amp;copy; Esri',
+  maxZoom: 19
+})</pre>
+    </div>
+    <p class="sg-note">Esri World Imagery — nützlich, um vor Ort tatsächliche Verhältnisse (z.B. Belagszustand) zu beurteilen; nicht die Standardebene, weil sie für die reine Routenübersicht schlechter lesbar ist.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="pins">
+  <div class="sg-section__title">Bewertungs-Pins <span>L.divIcon</span></div>
+  <div class="sg-h">Bewertungs-Pins</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Meldungen werden nie mit Leaflets Standard-Marker angezeigt, sondern mit einem
+    Tropfen-Pin, dessen Farbe die Bewertung codiert — dieselben fünf Farben wie
+    <a href="tokens.html#colors" style="color:var(--color-primary);"><code>--color-rate-1</code>…<code>--color-rate-5</code></a>
+    auf der Tokens-Seite, damit Bewertungsfarbe auf Karte, in Badges und in Formularen überall
+    identisch ist.
+  </p>
+  <div class="sg-swatch-row" style="margin-bottom:24px;">
+    <span class="sg-rate-chip"><svg class="sg-rate-chip__pin" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12C24 5.37 18.63 0 12 0z" fill="var(--color-rate-1)"/><circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/></svg>Gefährlich</span>
+    <span class="sg-rate-chip"><svg class="sg-rate-chip__pin" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12C24 5.37 18.63 0 12 0z" fill="var(--color-rate-2)"/><circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/></svg>Schlecht</span>
+    <span class="sg-rate-chip"><svg class="sg-rate-chip__pin" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12C24 5.37 18.63 0 12 0z" fill="var(--color-rate-3)"/><circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/></svg>Akzeptabel</span>
+    <span class="sg-rate-chip"><svg class="sg-rate-chip__pin" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12C24 5.37 18.63 0 12 0z" fill="var(--color-rate-4)"/><circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/></svg>Gut</span>
+    <span class="sg-rate-chip"><svg class="sg-rate-chip__pin" viewBox="0 0 24 32"><path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12C24 5.37 18.63 0 12 0z" fill="var(--color-rate-5)"/><circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/></svg>Ausgezeichnet</span>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">JS zum Kopieren</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">function makeIcon(rating) {
+  var color = RATING_COLORS[rating]; // --color-rate-1 … --color-rate-5
+  var svg = '&lt;svg viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg"&gt;'
+    + '&lt;path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12'
+    +      'C24 5.37 18.63 0 12 0z" fill="' + color + '"/&gt;'
+    + '&lt;circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/&gt;'
+    + '&lt;/svg&gt;';
+  return L.divIcon({
+    html: '&lt;div class="custom-pin"&gt;' + svg + '&lt;/div&gt;',
+    iconSize: [24, 32], iconAnchor: [12, 32], popupAnchor: [0, -34], className: ''
+  });
+}</pre>
+    </div>
+    <p class="sg-note">Teardrop + halbtransparenter Mittelkreis, kein Leaflet-Standard-Icon-Bild. <code>iconAnchor: [12, 32]</code> setzt die Pin-Spitze exakt auf die Koordinate.</p>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">CSS</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">.custom-pin { width: 24px; height: 32px; }
+.custom-pin svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22)); }</pre>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="container">
+  <div class="sg-section__title">Container &amp; Steuerelemente <span>site.css</span></div>
+  <div class="sg-h">Container &amp; Steuerelemente</div>
+  <ul style="max-width:680px;padding-left:20px;font:400 14px/1.7 var(--font-body);color:var(--color-text-muted);">
+    <li>Karten-Container: <code>border-radius: var(--radius-sm)</code> (kleine Inline-Karten, z.B. <code>.adm-detail-map</code>) oder <code>var(--radius-md)</code>/<code>var(--radius-lg)</code> für grössere Panels, plus <code>overflow: hidden</code> und <code>border: 1px solid var(--color-border)</code> — nie eine randlose Vollbild-Karte ausserhalb eines dedizierten Vollbild-Kontexts.</li>
+    <li>Stil-Toggle (Strasse/Satellit): oben rechts, <code>position: absolute; top: 12px; right: 12px;</code>, als zusammenhängende Button-Gruppe mit <code>var(--shadow-md)</code>, aktiver Zustand dunkel gefüllt (<code>var(--color-secondary)</code>) — siehe Markup unten.</li>
+    <li>Leaflets eigene Zoom-Controls bleiben Standard-Position (<code>bottomright</code> in Formularen, wo der Toggle oben rechts sitzt); Klicks auf Toggle/Zoom dürfen nie an darunterliegende Karten-Click-Handler durchgereicht werden (<code>L.DomEvent.disableClickPropagation</code>).</li>
+    <li>Popup-Schliessen-Button: <code>font-size: 16px !important; color: var(--color-muted) !important;</code> — Leaflets Default wirkt sonst zu klein/kontrastarm neben den übrigen UI-Elementen.</li>
+  </ul>
+</section>
+
+<section class="sg-section" id="live">
+  <div class="sg-section__title">Beispiel <span>Live-Rendering</span></div>
+  <div class="sg-h">Live-Karte</div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--live">live</span><span class="sg-badge sg-badge--label">Lädt echtes Leaflet 1.9.4 von der CDN</span></div>
+    <div class="sg-preview--fullbleed" style="position:relative;">
+      <div id="sg-map"></div>
+      <div class="sg-map-toggle">
+        <button type="button" class="sg-map-toggle-btn active" id="sg-btn-street">Strasse</button>
+        <button type="button" class="sg-map-toggle-btn" id="sg-btn-satellite">Satellit</button>
+      </div>
+    </div>
+    <p class="sg-note">Fünf Beispiel-Pins bei Wetzikon, je einer pro Bewertungsstufe — identischer Marker-Code wie oben dokumentiert.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="markup">
+  <div class="sg-section__title">Beispiel <span>Vollständiges Setup</span></div>
+  <div class="sg-h">Markup/CSS/JS zum Kopieren</div>
+  <div class="sg-component">
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">&lt;link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"&gt;
+&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"&gt;&lt;/script&gt;
+
+&lt;div id="map"&gt;&lt;/div&gt;
+&lt;div class="map-toggle"&gt;
+  &lt;button class="map-toggle-btn active" onclick="setLayer('street')"&gt;Strasse&lt;/button&gt;
+  &lt;button class="map-toggle-btn" onclick="setLayer('satellite')"&gt;Satellit&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+var map = L.map('map', { center: [47.3235, 8.7985], zoom: 15 });
+var LAYERS = {
+  street:    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+               { attribution: '&amp;copy; OpenStreetMap contributors &amp;copy; CARTO', subdomains: 'abcd', maxZoom: 19 }),
+  satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+               { attribution: '&amp;copy; Esri', maxZoom: 19 })
+};
+var currentLayer = 'street';
+LAYERS.street.addTo(map);
+
+function setLayer(name) {
+  if (name === currentLayer) return;
+  map.removeLayer(LAYERS[currentLayer]);
+  LAYERS[name].addTo(map);
+  currentLayer = name;
+  document.querySelectorAll('.map-toggle-btn').forEach(function (b) {
+    b.classList.toggle('active', b.textContent.trim() === (name === 'street' ? 'Strasse' : 'Satellit'));
+  });
+}
+&lt;/script&gt;</pre>
+    </div>
+    <p class="sg-note">Gekürzt (kein Event-Delegation-Boilerplate) — die vollständige, produktive Fassung inkl. Click-Propagation-Guards steht in <code>velo-melder.html</code>, Marker <code>COMPILE:MAP-ENGINE</code>.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="usage">
+  <div class="sg-section__title">Referenz <span>Konsumenten</span></div>
+  <div class="sg-h">Wo verwendet</div>
+  <ul style="max-width:720px;padding-left:20px;font:400 14px/1.7 var(--font-body);color:var(--color-text-muted);">
+    <li><strong>velofreundliches-wetzikon-contao</strong> · <code>public/additions/velo-melder.html</code> — Haupt-, Editor- und Detail-Vorschaukarten (Quelle dieser Doku, Marker <code>COMPILE:MAP-ENGINE</code>/<code>COMPILE:ROUTE-RENDER</code> im Repo).</li>
+    <li><strong>velofreundliches-wetzikon-contao</strong> · <code>public/additions/velo-velonetz-embed-3.html</code> — öffentliche Velonetz-Einbettung, gleicher Kartenstil, ohne Bewertungs-Pins (nur Routen-Bänder).</li>
+    <li><strong>velofreundliches-wetzikon-backend</strong> · <code>app/templates/admin/meldung_detail.html.twig</code> — Meldungs-Prüfkarte im Admin-Backend: derselbe Kartenstil/Toggle, Pin-Farbe folgt live der im Formular gewählten Bewertung, Pin bleibt ziehbar (admin-spezifisch, nicht Teil dieser Doku).</li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+(function () {
+  var RATING_COLORS = { 1: 'var(--color-rate-1)', 2: 'var(--color-rate-2)', 3: 'var(--color-rate-3)', 4: 'var(--color-rate-4)', 5: 'var(--color-rate-5)' };
+  var RATING_HEX     = { 1: '#b91c1c', 2: '#ea580c', 3: '#ca8a04', 4: '#65a30d', 5: '#15803d' };
+
+  function makeIcon(rating) {
+    var color = RATING_HEX[rating];
+    var svg = '<svg viewBox="0 0 24 32" xmlns="http://www.w3.org/2000/svg">'
+      + '<path d="M12 0C5.37 0 0 5.37 0 12c0 8.5 12 20 12 20S24 20.5 24 12C24 5.37 18.63 0 12 0z" fill="' + color + '"/>'
+      + '<circle cx="12" cy="12" r="5" fill="rgba(255,255,255,0.35)"/>'
+      + '</svg>';
+    return L.divIcon({ html: '<div class="sg-custom-pin">' + svg + '</div>', iconSize: [24, 32], iconAnchor: [12, 32], popupAnchor: [0, -34], className: '' });
+  }
+
+  var map = L.map('sg-map', { center: [47.3235, 8.7985], zoom: 14, scrollWheelZoom: false });
+  var LAYERS = {
+    street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap contributors &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }),
+    satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri', maxZoom: 19 })
+  };
+  var current = 'street';
+  LAYERS.street.addTo(map);
+
+  var SAMPLE = [
+    [47.3255, 8.7935, 1], [47.3225, 8.7965, 2], [47.3245, 8.8005, 3],
+    [47.3205, 8.7995, 4], [47.3265, 8.7975, 5]
+  ];
+  SAMPLE.forEach(function (p) {
+    L.marker([p[0], p[1]], { icon: makeIcon(p[2]) }).addTo(map);
+  });
+
+  document.getElementById('sg-btn-street').addEventListener('click', function () {
+    if (current === 'street') return;
+    map.removeLayer(LAYERS.satellite); LAYERS.street.addTo(map); current = 'street';
+    this.classList.add('active'); document.getElementById('sg-btn-satellite').classList.remove('active');
+  });
+  document.getElementById('sg-btn-satellite').addEventListener('click', function () {
+    if (current === 'satellite') return;
+    map.removeLayer(LAYERS.street); LAYERS.satellite.addTo(map); current = 'satellite';
+    this.classList.add('active'); document.getElementById('sg-btn-street').classList.remove('active');
+  });
+})();
+</script>
+</body>
+</html>
