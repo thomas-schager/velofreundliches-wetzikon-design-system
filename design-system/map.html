@@ -159,13 +159,15 @@ code { font-family: monospace; background: var(--color-surface-2); padding: 1px 
   <div class="sg-component">
     <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Strasse (Standard)</span></div>
     <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
-      <pre class="sg-code">L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+      <pre class="sg-code">var CARTO_API_KEY = 'cb1_2wxo_1_5095e615a6275239af744999'; // carto.com/basemaps/apikey
+
+L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=' + CARTO_API_KEY, {
   attribution: '&amp;copy; OpenStreetMap contributors &amp;copy; CARTO',
   subdomains: 'abcd',
   maxZoom: 19
 })</pre>
     </div>
-    <p class="sg-note">CARTO Voyager — helle, reduzierte Farbgebung, damit Routen/Pins/Bänder die Aufmerksamkeit behalten (kein OSM-Standardstil mit lauten POI-Icons).</p>
+    <p class="sg-note">CARTO Voyager — helle, reduzierte Farbgebung, damit Routen/Pins/Bänder die Aufmerksamkeit behalten (kein OSM-Standardstil mit lauten POI-Icons). Seit 2026-08 verlangt <code>basemaps.cartocdn.com</code> einen API-Key, sonst überklebt jede Kachel ein "API KEY REQUIRED"-Wasserzeichen (Request schlägt nicht fehl, sieht nur kaputt aus). Kostenloser Key ohne CARTO-Account: <a href="https://carto.com/basemaps/apikey/" style="color:var(--color-primary);">carto.com/basemaps/apikey</a> — der Key oben ist auf die Produktions-Domain registriert; bei einem anderen Host (z.B. lokale Entwicklung) ggf. einen eigenen anfordern. CARTO baut die Raster-Basemaps langfristig zugunsten von Vektor-Kacheln ab — falls dieser Dienst irgendwann ganz wegfällt, ist Standard-OpenStreetMap (<code>{s}.tile.openstreetmap.org/{z}/{x}/{y}.png</code>, kein Key nötig) der dokumentierte Fallback.</p>
   </div>
   <div class="sg-component">
     <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Satellit (umschaltbar)</span></div>
@@ -265,9 +267,10 @@ code { font-family: monospace; background: var(--color-surface-2); padding: 1px 
 &lt;/div&gt;
 
 &lt;script&gt;
+var CARTO_API_KEY = 'cb1_2wxo_1_5095e615a6275239af744999'; // carto.com/basemaps/apikey
 var map = L.map('map', { center: [47.3235, 8.7985], zoom: 15 });
 var LAYERS = {
-  street:    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+  street:    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=' + CARTO_API_KEY,
                { attribution: '&amp;copy; OpenStreetMap contributors &amp;copy; CARTO', subdomains: 'abcd', maxZoom: 19 }),
   satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
                { attribution: '&amp;copy; Esri', maxZoom: 19 })
@@ -318,9 +321,10 @@ function setLayer(name) {
     return L.divIcon({ html: '<div class="sg-custom-pin">' + svg + '</div>', iconSize: [24, 32], iconAnchor: [12, 32], popupAnchor: [0, -34], className: '' });
   }
 
+  var CARTO_API_KEY = 'cb1_2wxo_1_5095e615a6275239af744999'; // carto.com/basemaps/apikey
   var map = L.map('sg-map', { center: [47.3235, 8.7985], zoom: 14, scrollWheelZoom: false });
   var LAYERS = {
-    street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '&copy; OpenStreetMap contributors &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }),
+    street: L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png?key=' + CARTO_API_KEY, { attribution: '&copy; OpenStreetMap contributors &copy; CARTO', subdomains: 'abcd', maxZoom: 19 }),
     satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { attribution: '&copy; Esri', maxZoom: 19 })
   };
   var current = 'street';
