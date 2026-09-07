@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin-Backend UI-Patterns — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/* Same sg-* shell as map.html/brand-voice.html/contao-implementation.html. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: var(--tracking-tight); }
+
+.sg-wrap { display: flex; min-height: 100vh; }
+.sg-sidebar { width: 224px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; background: #0d0d0d; padding: 0 0 32px; z-index: 200; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+.sg-sidebar__head { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sg-sidebar__title { font: 700 14px var(--font-display); color: #fff; display: block; }
+.sg-sidebar__sub   { font: 400 11px var(--font-body); color: rgba(255,255,255,0.35); margin-top: 2px; display: block; }
+.sg-nav-group { margin-bottom: 2px; }
+.sg-nav-section { padding: 14px 20px 4px; font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+.sg-nav a { display: block; padding: 5px 20px 5px 28px; font: 400 12px var(--font-body); color: rgba(255,255,255,0.55); text-decoration: none; transition: color 120ms, background 120ms; border-left: 2px solid transparent; }
+.sg-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--color-primary); }
+.sg-nav a.sg-nav-crosslink { color: var(--color-primary); font-weight: 500; }
+
+.sg-main { margin-left: 224px; flex: 1; max-width: 1200px; }
+.sg-section { padding: 48px 48px 56px; border-bottom: 1px solid var(--color-border); }
+.sg-section:last-child { border-bottom: none; }
+.sg-section__title { font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 12px; margin-bottom: 28px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; }
+.sg-section__title span { font: 400 11px var(--font-body); text-transform: none; letter-spacing: 0; color: var(--color-border-strong); font-family: monospace; }
+.sg-h { font: 600 22px/1.2 var(--font-display); margin: 0 0 28px; }
+.sg-intro { font: 400 15px/1.6 var(--font-body); color: var(--color-text-muted); max-width: 720px; margin: -8px 0 32px; }
+
+.sg-component { margin-bottom: 36px; }
+.sg-component__labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.sg-badge { font: 500 11px/1 var(--font-body); font-family: monospace; border-radius: 3px; padding: 3px 7px; display: inline-block; }
+.sg-badge--label { font: 600 11px var(--font-body); color: var(--color-muted); font-family: inherit; background: none; border: none; padding: 0; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; }
+.sg-badge--live { background: #fff4e5; border: 1px solid #f5c877; color: #8a5a00; }
+.sg-badge--reused { background: #eef2ff; border: 1px solid #a5b4fc; color: #3730a3; }
+
+.sg-preview { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--white { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+
+.sg-rule-box {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: #eef2ff; border: 1px solid #a5b4fc; border-radius: 8px;
+  padding: 16px 20px; margin: 0 0 28px; max-width: 720px;
+}
+.sg-rule-box svg { color: #4338ca; flex-shrink: 0; margin-top: 2px; }
+.sg-rule-box strong { display: block; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #312e81; margin-bottom: 4px; }
+.sg-rule-box p { font: 400 13px/1.6 var(--font-body); color: #3730a3; margin: 0; }
+
+pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflow-x: auto; }
+code { font-family: monospace; background: var(--color-surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
+
+/* ---- Live component styles, copied from admin.css (see #usage for the source of truth) ---- */
+.pv-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 40px; padding: 0 16px;
+  border-radius: var(--radius-sm); border: 1px solid transparent;
+  font: 500 14px var(--font-body); letter-spacing: 0.01em;
+  cursor: pointer; white-space: nowrap; transition: all var(--dur) var(--ease);
+}
+.pv-btn--primary { background: var(--color-primary); color: #fff; border-color: var(--color-primary); }
+.pv-btn--primary:hover { background: var(--color-primary-hover); border-color: var(--color-primary-hover); }
+.pv-btn--secondary { background: #fff; color: var(--color-text); border-color: var(--color-border-strong); }
+.pv-btn--secondary:hover { background: var(--color-surface-2); }
+.pv-btn--danger { background: #fff; color: var(--color-danger); border-color: var(--color-danger); }
+.pv-btn--danger:hover { background: var(--color-danger); color: #fff; }
+.pv-btn--ghost { background: transparent; color: var(--color-text-muted); border-color: transparent; }
+.pv-btn--ghost:hover { background: var(--color-surface-2); color: var(--color-text); }
+.pv-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.pv-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+
+.pv-sticky {
+  background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 14px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; box-shadow: var(--shadow-lg);
+}
+.pv-sticky__status { font-size: 13px; color: var(--color-text-muted); margin-right: auto; }
+
+.pv-disclosure__trigger {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: #fff; cursor: pointer; font: 500 13px var(--font-body); color: var(--color-text); text-align: left;
+}
+.pv-disclosure__trigger:hover { background: var(--color-surface-2); }
+.pv-disclosure__chevron { flex-shrink: 0; transition: transform var(--dur) var(--ease); }
+.pv-disclosure.is-open .pv-disclosure__chevron { transform: rotate(180deg); }
+.pv-disclosure__body { display: none; padding: 12px 4px 4px; font-size: 13px; color: var(--color-text-muted); }
+.pv-disclosure.is-open .pv-disclosure__body { display: block; }
+
+.pv-alert { border-radius: var(--radius-sm); padding: 12px 14px; font-size: 13px; line-height: 1.5; display: flex; gap: 10px; }
+.pv-alert--info { background: var(--color-surface-2); color: var(--color-text); border: 1px solid var(--color-border); }
+.pv-alert--success { background: var(--color-success-tint); color: var(--color-success-dark); border: 1px solid #cfe0c4; }
+.pv-alert--error { background: var(--color-primary-tint); color: #7a2b00; border: 1px solid #f0b89a; }
+.pv-alert svg { flex-shrink: 0; margin-top: 1px; }
+
+.pv-badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 999px; padding: 3px 10px; font: 600 11px var(--font-body); line-height: 1.6; }
+.pv-badge--new { background: var(--color-primary-tint); color: #9a2604; }
+.pv-badge--published { background: var(--color-success-tint); color: var(--color-success-dark); }
+.pv-badge--declined { background: var(--color-surface-2); color: var(--color-muted); }
+.pv-badge__dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.pv-modal-demo { background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); max-width: 420px; overflow: hidden; }
+.pv-modal-demo__head { padding: 18px 22px 14px; border-bottom: 1px solid var(--color-border); }
+.pv-modal-demo__head h4 { font: 600 16px var(--font-display); margin-bottom: 4px; }
+.pv-modal-demo__head p { font-size: 13px; color: var(--color-text-muted); margin: 0; }
+.pv-modal-demo__body { padding: 14px 22px; font-size: 13px; color: var(--color-text); }
+.pv-modal-demo__foot { padding: 12px 22px; border-top: 1px solid var(--color-border); display: flex; justify-content: flex-end; gap: 10px; }
+
+.pv-toast { display: inline-flex; background: var(--color-secondary); color: #fff; padding: 10px 18px; border-radius: var(--radius-sm); font: 500 13px var(--font-body); box-shadow: var(--shadow-lg); }
+
+.pv-empty { text-align: center; padding: 40px 20px; color: var(--color-text-muted); }
+.pv-empty svg { color: var(--color-border-strong); margin-bottom: 16px; }
+.pv-empty h4 { font: 600 16px var(--font-display); color: var(--color-text); margin-bottom: 6px; }
+.pv-empty p { font-size: 14px; max-width: 340px; margin: 0 auto; }
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+
+<aside class="sg-sidebar">
+  <div class="sg-sidebar__head">
+    <span class="sg-sidebar__title">Admin-Backend UI-Patterns</span>
+    <span class="sg-sidebar__sub">Velofreundliches Wetzikon</span>
+  </div>
+  <nav class="sg-nav">
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Grundlage</span>
+      <a href="#buttons">Buttons</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Interaktionsmuster</span>
+      <a href="#sticky-bar">Sticky Action Bar</a>
+      <a href="#disclosure">Ausklapp-Muster (Chevron)</a>
+      <a href="#modal">Bestätigungs-Modal</a>
+      <a href="#toast">Toast</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Statusanzeige</span>
+      <a href="#alerts">Alerts</a>
+      <a href="#badges">Badges</a>
+      <a href="#empty">Empty State</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Referenz</span>
+      <a href="#usage">Wo verwendet</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Diese Doku-Seite</span>
+      <a href="tokens.html" class="sg-nav-crosslink">→ Design Tokens</a>
+      <a href="map.html" class="sg-nav-crosslink">→ Karten (Leaflet)</a>
+      <a href="contao-implementation.html" class="sg-nav-crosslink">→ Contao-Implementierung</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="sg-main">
+
+<section class="sg-section" id="intro">
+  <div class="sg-section__title">Über diese Seite <span>velofreundliches-wetzikon-backend</span></div>
+  <div class="sg-h">Admin-Backend UI-Patterns</div>
+  <p class="sg-intro">
+    Das Admin-Backend hat ein eigenes Komponenten-Set (<code>.adm-*</code>, in
+    <code>velofreundliches-wetzikon-backend/app/public/assets/admin.css</code>) — bewusst getrennt
+    von der öffentlichen Seite (<code>.vw-*</code>), wie in
+    <a href="../design-system-sharing-strategy.md" style="color:var(--color-primary);">design-system-sharing-strategy.md</a>
+    entschieden: eine Login-Maske, ein Datentabellen-Backend und eine Moderations-Queue bilden sich
+    nicht sinnvoll auf ein Marketing-Seiten-Komponenten-System ab. Was <em>weiterhin</em> geteilt
+    wird, sind die <a href="tokens.html" style="color:var(--color-primary);">Design Tokens</a>
+    (Farben, Abstände, Radien, Schatten) — jedes Pattern hier ist damit gebaut, nicht mit eigenen Werten.
+  </p>
+  <p class="sg-intro" style="margin-top:-16px;">
+    Diese Seite dokumentiert nicht jede CSS-Klasse aus <code>admin.css</code>, sondern die
+    Interaktionsmuster, die mehrfach unabhängig wiederverwendet wurden (oder klar dafür bestimmt
+    sind) — mit der Regel dahinter, nicht nur dem Aussehen. Feature-spezifisches Markup (z.B. der
+    Routen-Editor: Typ-Pillen, Legende, Wegpunkt-Marker) gehört nicht hierher, weil keine andere
+    Backend-Seite es wiederverwenden würde.
+  </p>
+</section>
+
+<section class="sg-section" id="buttons">
+  <div class="sg-section__title">Grundlage <span>.adm-btn</span></div>
+  <div class="sg-h">Buttons</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Fünf Varianten, eine Bedeutung pro Kontext: <strong>primary</strong> für die eine Haupthandlung
+    einer Ansicht, <strong>secondary</strong> für gleichrangige/neutrale Aktionen,
+    <strong>danger</strong> für zerstörerische, <strong>ghost</strong> für die unauffälligste Stufe
+    (z.B. "Abbrechen" in einer Symbolleiste). Nie zwei <code>--primary</code>-Buttons nebeneinander —
+    das ist der häufigste Fehler, der die Hierarchie zerstört.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white">
+      <div class="pv-row">
+        <button class="pv-btn pv-btn--primary">Speichern</button>
+        <button class="pv-btn pv-btn--secondary">Verwerfen</button>
+        <button class="pv-btn pv-btn--danger">Löschen</button>
+        <button class="pv-btn pv-btn--ghost">Abbrechen</button>
+        <button class="pv-btn pv-btn--secondary" disabled title="Keine Änderungen">Deaktiviert</button>
+      </div>
+    </div>
+    <p class="sg-note">Deaktivierter Zustand: <code>opacity: 0.45</code> + <code>cursor: not-allowed</code> — immer mit einem <code>title</code>-Attribut, das erklärt <em>warum</em> (siehe Sticky Action Bar unten für die Regel, wann überhaupt deaktiviert wird).</p>
+  </div>
+</section>
+
+<section class="sg-section" id="sticky-bar">
+  <div class="sg-section__title">Interaktionsmuster <span>.adm-sticky-actions</span></div>
+  <div class="sg-h">Sticky Action Bar</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Fixierte Fussleiste für die Haupthandlungen einer Bearbeitungsansicht — bleibt beim Scrollen
+    erreichbar, unabhängig von der Seitenlänge. Statustext links (<code>margin-right: auto</code>
+    schiebt die Buttons nach rechts), Aktionen rechts, sekundär vor primär.
+  </p>
+
+  <div class="sg-rule-box">
+    <i data-lucide="check-circle" width="20" height="20"></i>
+    <div>
+      <strong>Regel: nur deaktivieren, wenn die Aktion aktuell wirkungslos wäre.</strong>
+      <p>
+        Nicht "immer aktiv" und nicht "grundsätzlich deaktiviert bis geprüft" — sondern präzise:
+        ein Button ist deaktiviert genau dann, wenn ein Klick gerade nichts Sinnvolles täte. Ein
+        reiner Speichern/Verwerfen-Button ist wirkungslos, solange nichts geändert wurde. Ein
+        Workflow-Button wie "Veröffentlichen" ist wirkungslos, wenn der Datensatz das Ziel bereits
+        erreicht hat — unabhängig davon, ob gerade ein Feld bearbeitet wurde. Beide Fälle sind
+        unten als Live-Beispiel zu sehen, weil sie in der echten Anwendung unterschiedliche Regeln
+        brauchen, nicht dieselbe Logik kopiert bekommen.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--reused">2× verwendet</span><span class="sg-badge sg-badge--label">Variante: Speichern/Verwerfen</span></div>
+    <div class="sg-preview" style="padding:0;">
+      <div class="pv-sticky">
+        <span class="pv-sticky__status" aria-live="polite">Keine ungespeicherten Änderungen</span>
+        <button class="pv-btn pv-btn--secondary" disabled title="Keine Änderungen">Verwerfen</button>
+        <button class="pv-btn pv-btn--primary" disabled title="Keine Änderungen">Speichern</button>
+      </div>
+    </div>
+    <p class="sg-note">Routen-Editor (<code>/routen</code>): reine "ungespeicherte Änderungen"-Leiste, keine Workflow-Bedeutung. Beide Buttons deaktiviert, bis der Status wirklich "dirty" ist — und zusätzlich, solange eine einzelne Routen-Aktion (Zeichnen/Wegpunkte/Löschen) noch offen ist, weil "den ganzen Änderungssatz speichern" während einer einzelnen unfertigen Aktion keine wohldefinierte Bedeutung hätte.</p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--reused">2× verwendet</span><span class="sg-badge sg-badge--label">Variante: Workflow (drei Buttons)</span></div>
+    <div class="sg-preview" style="padding:0;">
+      <div class="pv-sticky">
+        <span class="pv-sticky__status" aria-live="polite">Status: <strong>Veröffentlicht</strong></span>
+        <button class="pv-btn pv-btn--danger">Ablehnen</button>
+        <button class="pv-btn pv-btn--secondary" disabled title="Keine Änderungen zum Speichern">Änderungen speichern</button>
+        <button class="pv-btn pv-btn--primary" disabled title="Bereits veröffentlicht">Veröffentlichen</button>
+      </div>
+    </div>
+    <p class="sg-note">Meldungs-Prüfung: "Änderungen speichern" folgt derselben Dirty-Regel wie oben; "Veröffentlichen"/"Ablehnen" sind Workflow-Übergänge und daher unabhängig von Feldänderungen — nur deaktiviert, wenn der Datensatz den jeweiligen Zielstatus bereits hat (hier: bereits veröffentlicht, "Ablehnen" bleibt möglich).</p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">CSS</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">.adm-sticky-actions {
+  position: sticky; bottom: 0; margin-top: var(--space-6);
+  background: #fff; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 14px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  box-shadow: var(--shadow-lg);
+}
+.adm-sticky-actions__status { font-size: 13px; color: var(--color-text-muted); margin-right: auto; }</pre>
+    </div>
+    <p class="sg-note">Statustext trägt <code>aria-live="polite"</code>, damit ein Statuswechsel (z.B. "Ungespeicherte Änderungen") auch ohne Fokus auf der Leiste per Screenreader angekündigt wird.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="disclosure">
+  <div class="sg-section__title">Interaktionsmuster <span>rotate 180deg</span></div>
+  <div class="sg-h">Ausklapp-Muster (Chevron)</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Ein Trigger, ein rotierendes Chevron-Icon, ein Inhalt, der bei Bedarf erscheint. Unabhängig
+    dreimal im Backend entstanden — Nutzermenü, Sidebar-Einklappen, Versionsverlauf-Zeilen — bevor
+    es hier als ein Muster benannt wurde. Genau dieser Umstand (mehrfach unabhängig erreicht, nicht
+    einmal erfunden und überall hinkopiert) ist, warum es dokumentiert wird: die nächste Stelle, die
+    "etwas ausklappbar machen" braucht, soll dieses Muster wiederverwenden statt ein viertes zu erfinden.
+  </p>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--reused">3× verwendet</span><span class="sg-badge sg-badge--live">live</span></div>
+    <div class="sg-preview--white">
+      <div class="pv-disclosure" id="pv-disclosure-demo" style="max-width:360px;">
+        <button class="pv-disclosure__trigger" id="pv-disclosure-trigger" aria-expanded="false">
+          <span>4.9.2026, 15:56 · thomas@schager.ch</span>
+          <i data-lucide="chevron-down" width="15" height="15" class="pv-disclosure__chevron"></i>
+        </button>
+        <div class="pv-disclosure__body">Details erscheinen erst, wenn die Zeile geöffnet wird — nicht permanent sichtbar, um die Liste kompakt zu halten.</div>
+      </div>
+    </div>
+    <p class="sg-note">Klick zum Testen. Kollabiert startet immer eingeklappt (nie standardmässig offen); der Zustand liegt in einer <code>.is-open</code>-Klasse auf dem äusseren Element, nicht auf dem Trigger selbst, damit Trigger <em>und</em> Inhalt vom selben Zustand gesteuert werden.</p>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">CSS</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">.x-trigger { display: flex; align-items: center; justify-content: space-between; cursor: pointer; }
+.x-chevron { transition: transform var(--dur) var(--ease); }
+.x.is-open .x-chevron { transform: rotate(180deg); }
+.x-body { display: none; }
+.x.is-open .x-body { display: block; }</pre>
+    </div>
+    <pre class="sg-code" style="margin-top:10px;">trigger.addEventListener('click', function () {
+  var expanded = container.classList.toggle('is-open');
+  trigger.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+});</pre>
+    <p class="sg-note"><code>aria-expanded</code> auf dem Trigger-Button gehört immer dazu, nicht nur die visuelle Rotation.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="modal">
+  <div class="sg-section__title">Interaktionsmuster <span>.adm-modal</span></div>
+  <div class="sg-h">Bestätigungs-Modal</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Für eine Aktion, die eine Zusammenfassung braucht, bevor sie unumkehrbar wird (z.B. der
+    Routen-Editor zeigt vor jedem Speichern eine Änderungsliste). Kein generisches "Bist du
+    sicher?" — der Modal-Inhalt zeigt konkret, <em>was</em> passiert, damit die Bestätigung eine
+    informierte Entscheidung ist, keine Formsache.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview">
+      <div class="pv-modal-demo" style="margin:0 auto;">
+        <div class="pv-modal-demo__head">
+          <h4>Änderungen bestätigen</h4>
+          <p>2 hinzugefügt · 1 entfernt · 0 geändert</p>
+        </div>
+        <div class="pv-modal-demo__body">Konkrete, prüfbare Zusammenfassung statt generischer Warnung — z.B. eine Liste betroffener Objekte.</div>
+        <div class="pv-modal-demo__foot">
+          <button class="pv-btn pv-btn--secondary">Abbrechen</button>
+          <button class="pv-btn pv-btn--primary">Speichern bestätigen</button>
+        </div>
+      </div>
+    </div>
+    <p class="sg-note">Overlay <code>rgba(0,0,0,0.5)</code>, Modal selbst <code>var(--shadow-lg)</code> + <code>var(--radius-lg)</code>, max-width 560px. "Abbrechen" immer secondary/links, die bestätigende Aktion immer primary/rechts — Klickreihenfolge von links (Rückzug) nach rechts (Commit), nie umgekehrt.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="toast">
+  <div class="sg-section__title">Interaktionsmuster <span>.adm-toast</span></div>
+  <div class="sg-h">Toast</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Kurze, sich selbst schliessende Bestätigung nach einer bereits abgeschlossenen Aktion ("Änderungen
+    gespeichert.") — kein Blocking-Dialog, keine Handlung erforderlich. Unten mittig, 2.5 Sekunden
+    sichtbar. Nicht für Fehler verwenden, die eine Reaktion brauchen (dafür <code>.adm-alert--error</code>
+    oder <code>alert()</code>, je nach Dringlichkeit) — ein Toast verschwindet von selbst, eine
+    Fehlermeldung, die jemand vielleicht gerade nicht sieht, darf das nicht tun.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview" style="display:flex;justify-content:center;">
+      <div class="pv-toast">Änderungen gespeichert.</div>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="alerts">
+  <div class="sg-section__title">Statusanzeige <span>.adm-alert</span></div>
+  <div class="sg-h">Alerts</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Inline-Hinweis innerhalb einer Seite (nicht schwebend wie Toast, nicht blockierend wie Modal) —
+    info/success/error, jeweils mit eigenem Tint statt reinem Rot/Grün, damit es neben den
+    Bewertungsfarben (<code>--color-rate-*</code>) nicht zu Verwechslungen kommt.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white" style="display:flex;flex-direction:column;gap:10px;max-width:480px;">
+      <div class="pv-alert pv-alert--info"><i data-lucide="info" width="16" height="16"></i><span>Dev-Modus: Code wird zusätzlich hier angezeigt.</span></div>
+      <div class="pv-alert pv-alert--success"><i data-lucide="check-circle" width="16" height="16"></i><span>Passwort erfolgreich geändert.</span></div>
+      <div class="pv-alert pv-alert--error"><i data-lucide="alert-triangle" width="16" height="16"></i><span>E-Mail-Adresse oder Passwort ist falsch.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="badges">
+  <div class="sg-section__title">Statusanzeige <span>.adm-badge</span></div>
+  <div class="sg-h">Badges</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Kompakter Statusindikator für Listen/Detail-Header — Farbe kodiert Bedeutung konsistent mit den
+    Alert-Tints oben, nicht neu erfunden pro Status.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white pv-row">
+      <span class="pv-badge pv-badge--new"><span class="pv-badge__dot"></span>Neu</span>
+      <span class="pv-badge pv-badge--published"><span class="pv-badge__dot"></span>Veröffentlicht</span>
+      <span class="pv-badge pv-badge--declined"><span class="pv-badge__dot"></span>Abgelehnt</span>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="empty">
+  <div class="sg-section__title">Statusanzeige <span>.adm-empty</span></div>
+  <div class="sg-h">Empty State</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Für jede Liste/Tabelle, die leer sein kann — Icon, kurzer Titel, ein erklärender Satz. Kein
+    einfaches "Keine Daten"; die Erklärung sagt, warum die Liste leer ist oder was als Nächstes
+    passiert (z.B. Versionsverlauf: "die erste wird beim nächsten Speichern angelegt").
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white">
+      <div class="pv-empty">
+        <i data-lucide="inbox" width="40" height="40"></i>
+        <h4>Keine Meldungen</h4>
+        <p>Neue VeloMelder-Einreichungen erscheinen hier automatisch.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="usage">
+  <div class="sg-section__title">Referenz <span>Quelle</span></div>
+  <div class="sg-h">Wo verwendet</div>
+  <p style="max-width:720px;margin-bottom:16px;">
+    Diese Seite ist Referenz-Dokumentation, keine Kopie der echten Stylesheets — die tatsächlichen
+    <code>.adm-*</code>-Klassen leben ausschliesslich im Backend-Repo (Tokens, nicht Komponenten,
+    werden zwischen den Repos geteilt, siehe <a href="../design-system-sharing-strategy.md" style="color:var(--color-primary);">design-system-sharing-strategy.md</a>).
+    Bei Widerspruch zwischen dieser Seite und dem echten CSS gilt das CSS als Quelle der Wahrheit —
+    diese Seite dann nachziehen.
+  </p>
+  <ul style="max-width:720px;padding-left:20px;font:400 14px/1.7 var(--font-body);color:var(--color-text-muted);">
+    <li><strong>velofreundliches-wetzikon-backend</strong> · <code>app/public/assets/admin.css</code> — Quelle aller Werte auf dieser Seite (Abschnitte BUTTONS, MELDUNG DETAIL, ROUTE EDITOR).</li>
+    <li><strong>velofreundliches-wetzikon-backend</strong> · <code>app/templates/admin/routes.html.twig</code> + <code>routes-editor.js</code> — Sticky Action Bar (Variante Speichern/Verwerfen), Ausklapp-Muster (Versionsverlauf), Bestätigungs-Modal, Toast.</li>
+    <li><strong>velofreundliches-wetzikon-backend</strong> · <code>app/templates/admin/meldung_detail.html.twig</code> — Sticky Action Bar (Workflow-Variante), Alerts, Badges.</li>
+    <li><strong>velofreundliches-wetzikon-backend</strong> · <code>app/templates/admin/_layout.html.twig</code> — Ausklapp-Muster (Nutzermenü, Sidebar-Einklappen).</li>
+    <li><strong>velofreundliches-wetzikon-backend</strong> · <code>app/templates/admin/meldungen.html.twig</code> — Empty State, Badges.</li>
+  </ul>
+</section>
+
+</main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  document.getElementById('pv-disclosure-trigger').addEventListener('click', function () {
+    var container = document.getElementById('pv-disclosure-demo');
+    var expanded = container.classList.toggle('is-open');
+    this.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+  });
+</script>
+</body>
+</html>
