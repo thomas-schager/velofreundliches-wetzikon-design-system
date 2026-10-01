@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E-Mail-Vorlage — Velofreundliches Wetzikon</title>
+<link href="https://fonts.googleapis.com/css2?family=Jost:wght@400;500;600;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens.css">
+<style>
+/* Same sg-* shell as map.html/admin-patterns.html/brand-voice.html. */
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: var(--text-lg);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text);
+  background: var(--color-background);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: var(--tracking-tight); }
+
+.sg-wrap { display: flex; min-height: 100vh; }
+.sg-sidebar { width: 224px; flex-shrink: 0; position: fixed; top: 0; left: 0; bottom: 0; overflow-y: auto; background: #0d0d0d; padding: 0 0 32px; z-index: 200; scrollbar-width: thin; scrollbar-color: #333 transparent; }
+.sg-sidebar__head { padding: 24px 20px 18px; border-bottom: 1px solid rgba(255,255,255,0.08); margin-bottom: 12px; }
+.sg-sidebar__title { font: 700 14px var(--font-display); color: #fff; display: block; }
+.sg-sidebar__sub   { font: 400 11px var(--font-body); color: rgba(255,255,255,0.35); margin-top: 2px; display: block; }
+.sg-nav-group { margin-bottom: 2px; }
+.sg-nav-section { padding: 14px 20px 4px; font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: rgba(255,255,255,0.25); display: block; }
+.sg-nav a { display: block; padding: 5px 20px 5px 28px; font: 400 12px var(--font-body); color: rgba(255,255,255,0.55); text-decoration: none; transition: color 120ms, background 120ms; border-left: 2px solid transparent; }
+.sg-nav a:hover { color: #fff; background: rgba(255,255,255,0.05); border-left-color: var(--color-primary); }
+.sg-nav a.sg-nav-crosslink { color: var(--color-primary); font-weight: 500; }
+
+.sg-main { margin-left: 224px; flex: 1; max-width: 1200px; }
+.sg-section { padding: 48px 48px 56px; border-bottom: 1px solid var(--color-border); }
+.sg-section:last-child { border-bottom: none; }
+.sg-section__title { font: 700 10px var(--font-body); letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-muted); padding-bottom: 12px; margin-bottom: 28px; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 12px; }
+.sg-section__title span { font: 400 11px var(--font-body); text-transform: none; letter-spacing: 0; color: var(--color-border-strong); font-family: monospace; }
+.sg-h { font: 600 22px/1.2 var(--font-display); margin: 0 0 28px; }
+.sg-intro { font: 400 15px/1.6 var(--font-body); color: var(--color-text-muted); max-width: 720px; margin: -8px 0 32px; }
+
+.sg-component { margin-bottom: 36px; }
+.sg-component__labels { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
+.sg-badge { font: 500 11px/1 var(--font-body); font-family: monospace; border-radius: 3px; padding: 3px 7px; display: inline-block; }
+.sg-badge--label { font: 600 11px var(--font-body); color: var(--color-muted); font-family: inherit; background: none; border: none; padding: 0; letter-spacing: 0.04em; text-transform: uppercase; font-size: 10px; }
+.sg-badge--live { background: #fff4e5; border: 1px solid #f5c877; color: #8a5a00; }
+
+.sg-preview { background: var(--color-surface-2); border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-preview--white { background: #fff; border: 1px solid var(--color-border); border-radius: 8px; padding: 28px 32px; }
+.sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+
+.sg-rule-box {
+  display: flex; gap: 14px; align-items: flex-start;
+  background: #eef2ff; border: 1px solid #a5b4fc; border-radius: 8px;
+  padding: 16px 20px; margin: 0 0 28px; max-width: 720px;
+}
+.sg-rule-box svg { color: #4338ca; flex-shrink: 0; margin-top: 2px; }
+.sg-rule-box strong { display: block; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: #312e81; margin-bottom: 4px; }
+.sg-rule-box p { font: 400 13px/1.6 var(--font-body); color: #3730a3; margin: 0; }
+
+pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflow-x: auto; }
+code { font-family: monospace; background: var(--color-surface-2); padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
+
+/* ---- Fake e-mail-client chrome around the live iframe preview ---- */
+.email-client {
+  border: 1px solid var(--color-border); border-radius: 8px; overflow: hidden; box-shadow: var(--shadow-md);
+  background: #fff;
+}
+.email-client__head { padding: 14px 20px; border-bottom: 1px solid var(--color-border); background: var(--color-surface-2); }
+.email-client__row { display: flex; gap: 8px; font-size: 13px; line-height: 1.6; }
+.email-client__row b { color: var(--color-muted); font-weight: 600; width: 60px; flex-shrink: 0; }
+.email-client__row span { color: var(--color-text); }
+.email-client iframe { display: block; width: 100%; border: 0; background: #fafaf8; }
+</style>
+</head>
+<body>
+<div class="sg-wrap">
+
+<aside class="sg-sidebar">
+  <div class="sg-sidebar__head">
+    <span class="sg-sidebar__title">E-Mail-Vorlage</span>
+    <span class="sg-sidebar__sub">Velofreundliches Wetzikon</span>
+  </div>
+  <nav class="sg-nav">
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Bausteine</span>
+      <a href="#logo">Logo &amp; Header</a>
+      <a href="#text">Absätze &amp; Listen</a>
+      <a href="#buttons">Buttons</a>
+      <a href="#images">Bilder</a>
+      <a href="#footer">Footer</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Beispiel</span>
+      <a href="#preview">Vollständige Vorlage</a>
+      <a href="#markup">Markup zum Kopieren</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Einbindung</span>
+      <a href="#logo-url">Logo-URL pro Umgebung</a>
+      <a href="#utm">UTM-Parameter</a>
+      <a href="#usage">Wo verwendet</a>
+    </div>
+    <div class="sg-nav-group">
+      <span class="sg-nav-section">Diese Doku-Seite</span>
+      <a href="tokens.html" class="sg-nav-crosslink">→ Design Tokens</a>
+      <a href="contao-implementation.html" class="sg-nav-crosslink">→ Contao-Implementierung</a>
+    </div>
+  </nav>
+</aside>
+
+<main class="sg-main">
+
+<section class="sg-section" id="intro">
+  <div class="sg-section__title">Über diese Seite <span>email-template.html</span></div>
+  <div class="sg-h">E-Mail-Vorlage</div>
+  <p class="sg-intro">
+    Transaktions-E-Mails (z.B. VeloMelder-Bestätigungslinks aus
+    <code>velofreundliches-wetzikon-backend</code>) brauchen eine eigene, deutlich
+    eingeschränktere Bauweise als die Website: Tabellen statt Flexbox/Grid, inline
+    <code>style</code>-Attribute statt Stylesheets, und für Outlook (das Word-Rendering benutzt,
+    nicht einen echten Browser-Engine) separate Konditional-Blöcke für Dinge wie abgerundete
+    Ecken. <code>email-template.html</code> (dieser Ordner) ist die kanonische Vorlage — diese
+    Seite erklärt, warum sie so aufgebaut ist, Baustein für Baustein.
+  </p>
+  <div class="sg-rule-box">
+    <i data-lucide="info" width="20" height="20"></i>
+    <div>
+      <strong>Kein MJML-Build — aber MJMLs Lösungen, von Hand übernommen.</strong>
+      <p>
+        MJML ist ein Compiler, der aus kurzem Markup (<code>&lt;mj-button&gt;</code> etc.) genau
+        dieses tabellenbasierte, Outlook-sichere HTML erzeugt. Für ein Projekt mit einer
+        Hand voll E-Mail-Vorlagen lohnt sich die zusätzliche Build-Toolchain nicht — stattdessen
+        ist <code>email-template.html</code> von Hand genau nach dem Muster gebaut, das MJML
+        selbst für Buttons kompiliert (VML-<code>&lt;v:roundrect&gt;</code> für Outlook, siehe
+        <a href="#buttons" style="color:var(--color-primary);">Buttons</a>) — derselbe Effekt,
+        ohne Abhängigkeit von einem Build-Schritt.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="logo">
+  <div class="sg-section__title">Bausteine <span>Header</span></div>
+  <div class="sg-h">Logo &amp; Header</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Das Logo ist ein <strong>Rasterbild</strong> (<code>email-logo.png</code>, 420×72px, 2× für
+    Retina, dargestellt bei 168×29), kein SVG und keine Nachbildung des Web-Lockups (<code>.vw-logo</code>:
+    Balken + zwei Zeilen Jost) aus <code>&lt;div&gt;</code>/<code>&lt;span&gt;</code> — Outlook
+    rendert weder SVG noch verlässlich Flexbox-Lockups. Das PNG wurde direkt aus
+    <code>logo.svg</code> gerastert (<code>rsvg-convert</code>), damit es exakt dem Web-Logo
+    entspricht statt einer zweiten, separat gepflegten Nachbildung.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white" style="padding:20px;">
+      <img src="email-logo.png" width="168" height="29" alt="Velofreundliches Wetzikon" style="display:block;">
+    </div>
+    <p class="sg-note">Immer mit expliziten <code>width</code>/<code>height</code>-HTML-Attributen (nicht nur CSS) — viele Clients blockieren externe Bilder standardmässig und reservieren den Platz nur, wenn diese Attribute vorhanden sind.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="text">
+  <div class="sg-section__title">Bausteine <span>Fliesstext</span></div>
+  <div class="sg-h">Absätze &amp; Listen</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    16px/1.6 (<code>--text-base</code>/<code>--lh-relaxed</code>) statt der 18px/1.7 von
+    <code>.vw-prose</code> auf der Website — eine Stufe kleiner, weil E-Mails oft in schmalen
+    Vorschaufenstern (Outlook-Lesebereich, Handy-Mail-App) gelesen werden, wo 18px unnötig viel
+    Zeilenumbruch erzeugt. Listen benutzen verschachtelte <code>&lt;table&gt;</code>-Zellen für
+    Nummer/Bullet + Text statt <code>&lt;ol&gt;</code>/<code>&lt;ul&gt;</code> mit
+    <code>list-style</code> — letzteres rendert in Outlook mit inkonsistentem Einzug.
+  </p>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Absatz</span></div>
+    <div class="sg-preview--white">
+      <p style="margin:0 0 16px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;">Hoi, danke für deine Meldung zum gelben Band. Hier siehst du, wie die verschiedenen Bausteine dieser Vorlage zusammenspielen.</p>
+      <p style="margin:0;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;">Ein zweiter Absatz mit demselben Abstand (16px) und Zeilenabstand (1.6).</p>
+    </div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Nummerierte Liste</span></div>
+    <div class="sg-preview--white">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="padding:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="24" valign="top" style="font-weight:500;">1.</td><td valign="top">Wir prüfen deine Meldung.</td></tr></table></td></tr>
+        <tr><td style="font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="24" valign="top" style="font-weight:500;">2.</td><td valign="top">Nach Freigabe erscheint sie auf der Karte.</td></tr></table></td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Aufzählung</span></div>
+    <div class="sg-preview--white">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr><td style="padding:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="20" valign="top" style="color:#dc3406;">&#8226;</td><td valign="top">Die Bestätigung ist 48 Stunden gültig.</td></tr></table></td></tr>
+        <tr><td style="font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td width="20" valign="top" style="color:#dc3406;">&#8226;</td><td valign="top">Deine Adresse wird nie öffentlich angezeigt.</td></tr></table></td></tr>
+      </table>
+    </div>
+    <p class="sg-note">Bullet ist das Zeichen <code>&amp;#8226;</code> in einer eigenen schmalen Zelle (<code>width="20"</code>), nicht <code>list-style</code> oder ein Hintergrundbild — ein einzelnes Zeichen rendert überall identisch.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="buttons">
+  <div class="sg-section__title">Bausteine <span>Bulletproof Buttons</span></div>
+  <div class="sg-h">Buttons</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Zwei Varianten, dieselbe Bedeutung wie auf der Website (<code>.vw-btn--primary</code>/
+    <code>.vw-btn--secondary</code>, siehe <a href="contao-implementation.html#buttons" style="color:var(--color-primary);">Contao-Implementierung</a>):
+    <strong>primary</strong> (gefüllt, <code>--color-primary</code>) für die eine Haupthandlung,
+    <strong>secondary</strong> (weiss, schwarzer Rand) für eine gleichrangige Zweithandlung. Nie
+    zwei primäre Buttons in derselben E-Mail.
+  </p>
+
+  <div class="sg-rule-box">
+    <i data-lucide="corner-down-right" width="20" height="20"></i>
+    <div>
+      <strong>Warum zwei Versionen pro Button (VML + HTML)?</strong>
+      <p>
+        Outlook Desktop (2007–heute) rendert E-Mails mit Word statt einem Browser-Engine — es
+        ignoriert <code>border-radius</code> komplett. Ohne Gegenmassnahme bekäme Outlook eckige
+        Buttons, alle anderen Clients runde. Die Lösung (<a href="https://mjml.io/" style="color:var(--color-primary);">MJMLs</a>
+        eigener Ansatz für <code>mj-button</code>): ein <code>&lt;v:roundrect&gt;</code>
+        (Microsofts Vector-Markup-Language, die Outlook versteht) nur für Outlook via
+        <code>&lt;!--[if mso]&gt;</code>-Konditionalkommentar, ein normaler gestylter
+        <code>&lt;a&gt;</code> für alle anderen via <code>&lt;!--[if !mso]&gt;&lt;!--&gt;</code> —
+        gegenseitig ausschliessend, sodass nie beide gleichzeitig erscheinen.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Live (so rendert es ausserhalb von Outlook)</span></div>
+    <div class="sg-preview--white">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+        <td style="padding:0 12px 0 0;">
+          <a href="#" style="background-color:#dc3406;border-radius:4px;color:#ffffff;display:inline-block;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;line-height:44px;text-align:center;text-decoration:none;width:220px;">Meldung ansehen</a>
+        </td>
+        <td>
+          <a href="#" style="background-color:#ffffff;border:1px solid #000000;border-radius:4px;color:#000000;display:inline-block;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;line-height:42px;text-align:center;text-decoration:none;width:198px;">Mehr erfahren</a>
+        </td>
+      </tr></table>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Markup (primary) — beide Pfade</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+<pre class="sg-code">&lt;!--[if mso]&gt;
+&lt;v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word"
+             href="#" style="height:44px;v-text-anchor:middle;width:220px;"
+             arcsize="18%" stroke="f" fillcolor="#dc3406"&gt;
+  &lt;w:anchorlock/&gt;
+  &lt;center style="color:#ffffff;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;"&gt;
+    Meldung ansehen
+  &lt;/center&gt;
+&lt;/v:roundrect&gt;
+&lt;![endif]--&gt;
+&lt;!--[if !mso]&gt;&lt;!--&gt;
+&lt;a href="#" target="_blank" style="background-color:#dc3406;border-radius:4px;color:#ffffff;
+   display:inline-block;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;
+   font-weight:500;line-height:44px;text-align:center;text-decoration:none;width:220px;
+   mso-hide:all;"&gt;
+  Meldung ansehen
+&lt;/a&gt;
+&lt;!--&lt;![endif]--&gt;</pre>
+    </div>
+    <p class="sg-note">Vollständig inkl. zweitem (secondary) Button in <code>email-template.html</code>, Abschnitt "BUTTONS".</p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">arcsize-Formel</span></div>
+    <div class="sg-preview">
+      <p style="margin:0 0 10px;font-size:14px;">
+        VMLs <code>arcsize</code> ist relativ, nicht in Pixeln: <code>radius = arcsize × (min(width, height) / 2)</code>.
+        Zielradius ist 4px (<code>--radius-sm</code>, identisch mit <code>.vw-btn</code> auf der
+        Website) bei der hier verwendeten 44px-Button-Höhe:
+      </p>
+      <pre class="sg-code">arcsize = radius ÷ (height ÷ 2) = 4 ÷ (44 ÷ 2) = 4 ÷ 22 ≈ 18%</pre>
+      <p style="margin:10px 0 0;font-size:14px;">
+        Ändert sich die Button-Höhe (z.B. 42px beim secondary-Button oben), <code>arcsize</code>
+        neu berechnen — es ist kein fixer Prozentsatz, der für jede Höhe denselben Pixel-Radius ergibt.
+      </p>
+    </div>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Bekannte Einschränkung</span></div>
+    <p style="max-width:680px;margin:0;font-size:14px;color:var(--color-text-muted);">
+      VML unterstützt keine automatische Breite — <code>width</code> ist ein fixer Pixelwert, der
+      von Hand zur jeweiligen Button-Beschriftung passen muss (zu schmal: Text läuft über; zu
+      breit: unschöner Leerraum). Das ist dieselbe Einschränkung, die MJMLs eigene
+      <code>mj-button</code>-Komponente hat — kein Kompromiss, den nur diese Hand-Lösung macht.
+    </p>
+  </div>
+</section>
+
+<section class="sg-section" id="images">
+  <div class="sg-section__title">Bausteine <span>Inhaltsbilder</span></div>
+  <div class="sg-h">Bilder</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Flüssige Breite (<code>width:100%</code>, <code>max-width</code> auf die Karteninnenbreite
+    begrenzt) mit einem <code>width</code>-HTML-Attribut auf die tatsächliche Breite (520px) —
+    Outlook reserviert den Platz nur mit diesem Attribut, nicht nur mit CSS, bevor das Bild
+    (sofern überhaupt automatisch geladen) ankommt.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white">
+      <img src="email-content-photo.png" width="400" alt="Beispielbild" style="display:block;width:100%;max-width:400px;height:auto;border:0;border-radius:8px;">
+    </div>
+    <p class="sg-note"><code>border-radius</code> auf dem Bild selbst: Gmail/Apple Mail runden, Outlook Desktop zeigt eckige Ecken (keine VML-Entsprechung für Bilder) — akzeptierter, unauffälliger Unterschied.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="footer">
+  <div class="sg-section__title">Bausteine <span>Footer</span></div>
+  <div class="sg-h">Footer</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Fixer Pflichttext in jeder E-Mail dieser Vorlage — Absenderidentität und Impressum-Pflichtangabe,
+    nicht pro E-Mail anpassbar.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview--white" style="text-align:center;">
+      <div style="font-family:Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#8a8a86;">
+        Velofreundliches Wetzikon — private Initiative<br>
+        Thom Hoffmann · Messikommerstrasse 37 · 8620 Wetzikon<br>
+        <a href="https://velofreundliches-wetzikon.ch/impressum-editor/" style="color:#8a8a86;text-decoration:underline;">Impressum</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="preview">
+  <div class="sg-section__title">Beispiel <span>email-template.html</span></div>
+  <div class="sg-h">Vollständige Vorlage</div>
+  <p class="sg-intro">
+    Alle Bausteine zusammengesetzt, live als <code>&lt;iframe&gt;</code> aus der tatsächlichen
+    Datei gerendert — was hier erscheint, ist exakt das Markup, das kopiert würde, nicht eine
+    Nachbildung davon.
+  </p>
+  <div class="sg-component">
+    <div class="email-client">
+      <div class="email-client__head">
+        <div class="email-client__row"><b>Von</b><span>Velofreundliches Wetzikon &lt;notifications@velofreundliches-wetzikon.ch&gt;</span></div>
+        <div class="email-client__row"><b>Betreff</b><span>Bitte bestätige deine VeloMelder-Meldung</span></div>
+      </div>
+      <iframe src="email-template.html" title="E-Mail-Vorschau" style="height:1340px;"></iframe>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="markup">
+  <div class="sg-section__title">Beispiel <span>Datei</span></div>
+  <div class="sg-h">Markup zum Kopieren</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    <a href="email-template.html" style="color:var(--color-primary);">email-template.html</a> ist
+    die kanonische Quelle — vollständig, mit Kommentaren an jeder nicht offensichtlichen Stelle
+    (warum eine Ghost-Table, warum inline statt <code>&lt;style&gt;</code>, warum die
+    <code>arcsize</code>-Formel so und nicht anders). Diese Seite zeigt Ausschnitte zur
+    Orientierung; für eine echte E-Mail immer die vollständige Datei kopieren, nicht einzelne
+    Fragmente von hier.
+  </p>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--label">Plain-Text-Gegenstück</span></div>
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+      <p style="margin:0 0 10px;font-size:14px;">
+        <a href="email-template.txt" style="color:var(--color-primary);">email-template.txt</a> —
+        die <code>textTemplate</code>-Hälfte (neben <code>htmlTemplate</code>) einer
+        <code>TemplatedEmail</code>, nicht optional: ohne sie zeigt jeder Client, der HTML nicht
+        rendert oder der Nutzer "Nur-Text anzeigen" wählt, gar nichts an. Zwei bewusste
+        Abweichungen vom HTML, nicht Lücken:
+      </p>
+      <pre class="sg-code">Meldung ansehen: #
+Mehr erfahren: #</pre>
+      <p style="margin:10px 0 0;font-size:14px;">
+        Buttons werden zu "Beschriftung: URL"-Zeilen (Standard-Konvention für Call-to-Actions in
+        Klartext-E-Mails) — und das Inhaltsbild entfällt ganz, da Klartext keine Bilder tragen kann.
+      </p>
+    </div>
+  </div>
+  <div class="sg-rule-box">
+    <i data-lucide="alert-triangle" width="20" height="20"></i>
+    <div>
+      <strong>Drei Platzhalter beim Kopieren ersetzen.</strong>
+      <p>
+        1. Das Logo-<code>&lt;img src&gt;</code> — relativer Pfad hier nur für die lokale Vorschau,
+        muss eine absolute, pro Umgebung unterschiedliche URL werden (siehe
+        <a href="#logo-url" style="color:#3730a3;">Logo-URL pro Umgebung</a>). 2. Jedes Button-<code>href="#"</code>
+        — echtes Linkziel pro E-Mail. 3. Fliesstext/Listenpunkte/Bild — Platzhalterinhalt, der
+        jeweils konkrete Bausteine demonstriert, keine Kopiervorlage für echten Text.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="logo-url">
+  <div class="sg-section__title">Einbindung <span>Konfiguration pro Umgebung</span></div>
+  <div class="sg-h">Logo-URL pro Umgebung</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    E-Mail-Clients laden Bilder immer über eine absolute URL vom offenen Internet — ein relativer
+    Pfad (wie in der lokalen Vorschau hier) funktioniert nicht. In
+    <code>velofreundliches-wetzikon-backend</code> braucht es dafür <strong>kein neues
+    Konfigurationsfeld</strong>: <code>ReportSubmissionService::submit()</code> läuft innerhalb
+    des <code>POST /reports</code>-HTTP-Requests, also kennt Symfony Schema+Host (test-backend vs.
+    backend) bereits über den aktuellen Request-Kontext — genau derselbe Mechanismus, der
+    <code>confirmUrl</code> schon über <code>UrlGeneratorInterface::ABSOLUTE_URL</code> erzeugt.
+    Im Twig-Template genügt:
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+<pre class="sg-code">&lt;img src="{{ absolute_url(asset('assets/email/logo.png')) }}" width="168" height="29" alt="Velofreundliches Wetzikon"&gt;</pre>
+    </div>
+    <p class="sg-note"><code>asset()</code> (symfony/asset) + <code>absolute_url()</code> (symfony/twig-bridge) sind bereits registrierte Twig-Funktionen, keine zusätzliche Abhängigkeit. Das PNG selbst liegt in <code>app/public/assets/email/logo.png</code> (nicht Teil dieses Design-Repos). Ein manueller <code>app.email_asset_base_url</code>-Parameter wäre nur nötig, wenn eine E-Mail je ausserhalb eines HTTP-Requests verschickt würde (z.B. aus einem Konsolenbefehl) — kommt bei der Bestätigungsmail nicht vor.</p>
+  </div>
+</section>
+
+<section class="sg-section" id="utm">
+  <div class="sg-section__title">Einbindung <span>Tracking</span></div>
+  <div class="sg-h">UTM-Parameter</div>
+  <p style="max-width:680px;margin-bottom:20px;">
+    Jeder Link, der von einer E-Mail zurück auf <code>velofreundliches-wetzikon.ch</code> führt
+    (Logo, Impressum-Link im Footer — nicht der Bestätigungs-Button, der führt app-intern zu
+    <code>confirmUrl</code>), trägt UTM-Parameter, damit Klicks aus E-Mails in Google Analytics &amp;
+    Co. von anderem Traffic unterscheidbar sind.
+  </p>
+  <div class="sg-component">
+    <div class="sg-preview" style="padding:18px 22px;overflow-x:auto;">
+<pre class="sg-code">https://velofreundliches-wetzikon.ch/?utm_source=velomelder&amp;utm_medium=email&amp;utm_campaign=meldung_bestaetigung&amp;utm_content=logo</pre>
+    </div>
+    <p class="sg-note">Gleicher Link für Impressum: Pfad <code>/impressum-editor/</code> statt <code>/</code>, <code>utm_content=impressum</code> statt <code>logo</code> — sonst identisch.</p>
+  </div>
+  <div class="sg-component">
+    <table role="presentation" style="width:100%;max-width:680px;border-collapse:collapse;font-size:13px;">
+      <tr style="border-bottom:1px solid var(--color-border);">
+        <td style="padding:6px 12px 6px 0;font-weight:600;">Parameter</td>
+        <td style="padding:6px 0;font-weight:600;">Wert</td>
+        <td style="padding:6px 0;font-weight:600;">Variiert?</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--color-border);">
+        <td style="padding:6px 12px 6px 0;"><code>utm_source</code></td>
+        <td style="padding:6px 0;"><code>velomelder</code></td>
+        <td style="padding:6px 0;color:var(--color-muted);">Nein — immer dieses Tool als Ursprung</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--color-border);">
+        <td style="padding:6px 12px 6px 0;"><code>utm_medium</code></td>
+        <td style="padding:6px 0;"><code>email</code></td>
+        <td style="padding:6px 0;color:var(--color-muted);">Nein — immer dieser Kanal</td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--color-border);">
+        <td style="padding:6px 12px 6px 0;"><code>utm_campaign</code></td>
+        <td style="padding:6px 0;"><code>meldung_bestaetigung</code></td>
+        <td style="padding:6px 0;color:var(--color-muted);">Ja — pro E-Mail-Typ (nächste E-Mail braucht einen eigenen Wert)</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 12px 6px 0;"><code>utm_content</code></td>
+        <td style="padding:6px 0;"><code>logo</code> / <code>impressum</code></td>
+        <td style="padding:6px 0;color:var(--color-muted);">Ja — pro Link innerhalb derselben E-Mail</td>
+      </tr>
+    </table>
+  </div>
+  <div class="sg-rule-box">
+    <i data-lucide="alert-triangle" width="20" height="20"></i>
+    <div>
+      <strong>Nicht in der Klartext-Variante.</strong>
+      <p>
+        <code>email-template.txt</code>/<code>report_confirmation.txt.twig</code> zeigen die rohe
+        URL vollständig im Text — eine lange Query-String-URL wirkt dort als Störung und kann wie
+        ein verdächtiger Tracking-Link aussehen, während sie als unsichtbares <code>href</code>
+        eines HTML-Links niemandem auffällt. Impressum-Link in der Klartext-Version bleibt deshalb
+        <code>https://velofreundliches-wetzikon.ch/impressum-editor/</code>, ohne Parameter.
+      </p>
+    </div>
+  </div>
+</section>
+
+<section class="sg-section" id="usage">
+  <div class="sg-section__title">Referenz <span>Wo verwendet</span></div>
+  <div class="sg-h">Wo verwendet</div>
+  <p style="max-width:680px;">
+    <strong>velofreundliches-wetzikon-backend</strong> · <code>ReportSubmissionService::submit()</code> —
+    VeloMelder-Bestätigungsmail ("Bitte bestätige deine Meldung bei Velofreundliches Wetzikon"),
+    per <code>TemplatedEmail</code> (<code>templates/emails/report_confirmation.html.twig</code> +
+    <code>.txt.twig</code>). Erste E-Mail, die auf diese Vorlage umgestellt wurde — nur Logo,
+    Absätze, ein primärer Button und der Footer (keine Liste/kein Secondary-Button/kein
+    Inhaltsbild, weil keines davon zu einer Bestätigungsmail gehört). Die übrigen E-Mails dieses
+    Projekts sind noch nicht umgestellt.
+  </p>
+</section>
+
+</main>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<script>
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+</script>
+</body>
+</html>

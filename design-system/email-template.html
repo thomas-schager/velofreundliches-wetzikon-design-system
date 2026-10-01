@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<!--
+  CANONICAL E-MAIL TEMPLATE — Velofreundliches Wetzikon
+  ======================================================
+  Table-based, inline-styled HTML e-mail, hand-built to the same bulletproof-button/ghost-table
+  patterns MJML compiles down to — without pulling in the MJML build toolchain itself. See
+  email.html (this folder) for the full documentation: what each block is for, the VML-button
+  math, and how to adapt this into a Twig template with per-environment config.
+
+  THIS FILE is the thing to copy when wiring a real e-mail in the backend repo
+  (velofreundliches-wetzikon-backend, see ReportSubmissionService's confirmation e-mail). Four
+  things are placeholders here, marked inline where they appear:
+    1. The logo <img src> -- currently "email-logo.png" (this folder, for local preview only).
+       In Twig this must become an ABSOLUTE, per-environment URL (see email.html's "Logo-URL"
+       section) -- bare relative paths don't resolve inside an e-mail client.
+    2. Every button href -- currently "#", replace with the real target URL per e-mail.
+    3. The body copy/list items/image -- currently generic placeholder content demonstrating each
+       required element (paragraphs, ordered + unordered list, primary + secondary button, image),
+       not real copy for any specific e-mail.
+    4. utm_campaign on the logo/Impressum links -- "meldung_bestaetigung" here is the real
+       confirmation e-mail's value (this page's demo content borrows its real copy throughout);
+       change it to match whichever e-mail you're actually building. utm_source/utm_medium stay
+       "velomelder"/"email" across all of this project's e-mails; only utm_campaign (which e-mail)
+       and utm_content (which link within it) vary. See email.html's "UTM-Parameter" section.
+       Deliberately NOT added in email-template.txt -- the plain-text part shows the raw URL in
+       full, where a query string reads as clutter (and can look suspicious) in a way it doesn't
+       as a hyperlink's invisible href in HTML.
+
+  Rendering notes baked into the markup below (not just decoration -- removing these breaks a
+  real client somewhere):
+  - <center> + a conditional "ghost table" force a fixed 600px width in Outlook desktop (Word
+    engine ignores max-width on a div/table otherwise).
+  - Every structural element is a <table>/<td>, no <div> layout -- Outlook (Word) and many
+    webmail clients still don't reliably support block-level CSS layout.
+  - All styling is inline (style="..."), not in the <style> block -- Gmail strips <style> blocks
+    in some contexts (clipped/forwarded messages); inline styles always survive.
+  - The hidden preheader <div> sets the inbox preview snippet independent of the visible body.
+-->
+<html lang="de" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="color-scheme" content="light">
+<meta name="supported-color-schemes" content="light">
+<title>Velofreundliches Wetzikon</title>
+<!--[if mso]>
+<noscript>
+<xml>
+<o:OfficeDocumentSettings>
+<o:PixelsPerInch>96</o:PixelsPerInch>
+</o:OfficeDocumentSettings>
+</xml>
+</noscript>
+<style>
+  table { border-collapse: collapse; }
+  td, a, body { font-family: Roboto, Helvetica, Arial, sans-serif !important; }
+</style>
+<![endif]-->
+<style>
+  body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+  table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+  img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+  body { margin: 0; padding: 0; width: 100% !important; background: #fafaf8; }
+  a { color: #dc3406; }
+  @media screen and (max-width: 600px) {
+    .email-container { width: 100% !important; }
+    .email-padded { padding-left: 20px !important; padding-right: 20px !important; }
+    .stack { display: block !important; width: 100% !important; padding-bottom: 12px; }
+  }
+</style>
+</head>
+<body style="margin:0;padding:0;background:#fafaf8;">
+
+<!-- Preheader: sets the inbox preview snippet, never shown in the body itself. Keep it to one
+     short sentence specific to the e-mail -- an empty one lets the client fall back to showing
+     the first visible line of body text instead, which is usually worse. -->
+<div style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#fafaf8;">
+  Kurzer Vorschautext für die Posteingangs-Liste -- pro E-Mail anpassen.
+</div>
+
+<center style="width:100%;background:#fafaf8;">
+<!--[if mso]>
+<table role="presentation" width="600" align="center" cellpadding="0" cellspacing="0" border="0"><tr><td>
+<![endif]-->
+<table role="presentation" class="email-container" align="center" width="600" cellpadding="0" cellspacing="0" border="0" style="margin:0 auto;max-width:600px;width:100%;">
+
+  <!-- ============================== HEADER / LOGO ============================== -->
+  <tr>
+    <td class="email-padded" style="padding:32px 32px 24px;" align="left">
+      <!-- PLACEHOLDER 1/4: relative path for local preview only -- must be an absolute,
+           per-environment URL once this lives in a Twig template (see email.html → "Logo-URL"). -->
+      <!-- PLACEHOLDER 4/4: utm_campaign -- see the file-level comment above. -->
+      <a href="https://velofreundliches-wetzikon.ch/?utm_source=velomelder&amp;utm_medium=email&amp;utm_campaign=meldung_bestaetigung&amp;utm_content=logo" target="_blank">
+        <img src="email-logo.png" width="168" height="29" alt="Velofreundliches Wetzikon" style="display:block;border:0;outline:none;text-decoration:none;max-width:168px;" />
+      </a>
+    </td>
+  </tr>
+
+  <!-- ============================== CARD ============================== -->
+  <tr>
+    <td style="background:#ffffff;border:1px solid #e8e6e0;border-radius:8px;">
+      <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+        <tr>
+          <td class="email-padded" style="padding:40px 40px 8px;">
+
+            <!-- ---- Paragraphs ---- -->
+            <p style="margin:0 0 16px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;">
+              Hoi, danke für deine Meldung zum gelben Band. Hier siehst du, wie die verschiedenen
+              Bausteine dieser Vorlage zusammenspielen -- Absätze, Listen, Buttons und Bilder.
+            </p>
+            <p style="margin:0 0 24px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;">
+              Dieser zweite Absatz zeigt den normalen Zeilenabstand (1.6) und Abstand nach unten
+              (16px) für Fliesstext -- ein Schritt kleiner als die 18px/1.7 der Web-Variante
+              (<code>.vw-prose</code>), da E-Mail-Clients (Outlook-Vorschau, Handy-Mail-Apps) auf
+              kleineren/wechselnden Breiten gelesen werden.
+            </p>
+
+            <!-- ---- Ordered list ---- -->
+            <p style="margin:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;line-height:1.6;color:#000000;">
+              So geht es weiter:
+            </p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 24px;">
+              <tr>
+                <td style="padding:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                    <td width="24" valign="top" style="font-weight:500;">1.</td>
+                    <td valign="top">Wir prüfen deine Meldung.</td>
+                  </tr></table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                    <td width="24" valign="top" style="font-weight:500;">2.</td>
+                    <td valign="top">Nach Freigabe erscheint sie auf der Karte.</td>
+                  </tr></table>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                    <td width="24" valign="top" style="font-weight:500;">3.</td>
+                    <td valign="top">Du musst nichts weiter tun.</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- ---- Unordered list ----
+                 Real bullet glyphs ("•"), not a background-image/::before -- those are
+                 unreliable across clients, a plain character in a table cell always renders. -->
+            <p style="margin:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;line-height:1.6;color:#000000;">
+              Gut zu wissen:
+            </p>
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px;">
+              <tr>
+                <td style="padding:0 0 8px;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                    <td width="20" valign="top" style="color:#dc3406;">&#8226;</td>
+                    <td valign="top">Die Bestätigung ist 48 Stunden gültig.</td>
+                  </tr></table>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;" valign="top">
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
+                    <td width="20" valign="top" style="color:#dc3406;">&#8226;</td>
+                    <td valign="top">Deine Adresse wird nie öffentlich angezeigt.</td>
+                  </tr></table>
+                </td>
+              </tr>
+            </table>
+
+            <!-- ============================== BUTTONS ==============================
+                 Bulletproof pattern (same one MJML's mj-button compiles to): a real VML
+                 <v:roundrect> for Outlook desktop (true rounded corners, since Word's engine
+                 ignores CSS border-radius), a plain styled <a> for every other client. The two
+                 are mutually exclusive via [if mso]/[if !mso] so nothing doubles up.
+
+                 VML arcsize math: radius = arcsize * (min(width,height) / 2). Target radius is
+                 4px (--radius-sm, matching .vw-btn on the live site) at the standard 44px button
+                 height used here -> arcsize = 4 / (44/2) = 18%. Re-derive this if the height or
+                 target radius ever changes -- it isn't a fixed percentage.
+
+                 VML needs an explicit pixel width (no shrink-to-fit); the HTML/CSS side also sets
+                 a fixed width for visual parity rather than auto-sizing to the label. Pick a width
+                 that comfortably fits the actual button label when you adapt this -- there's no
+                 way to compute it automatically without a font-metrics tool. -->
+            <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px;">
+              <tr>
+                <!-- Primary button -->
+                <td style="padding:0 12px 0 0;">
+                  <!--[if mso]>
+                  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:44px;v-text-anchor:middle;width:220px;" arcsize="18%" stroke="f" fillcolor="#dc3406">
+                  <w:anchorlock/>
+                  <center style="color:#ffffff;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;">Meldung ansehen</center>
+                  </v:roundrect>
+                  <![endif]-->
+                  <!--[if !mso]><!-->
+                  <!-- PLACEHOLDER 2/4: href="#" -- replace with the real target URL per e-mail. -->
+                  <a href="#" target="_blank" style="background-color:#dc3406;border-radius:4px;color:#ffffff;display:inline-block;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;line-height:44px;text-align:center;text-decoration:none;width:220px;-webkit-text-size-adjust:none;mso-hide:all;">Meldung ansehen</a>
+                  <!--<![endif]-->
+                </td>
+                <!-- Secondary button -->
+                <td>
+                  <!--[if mso]>
+                  <v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" xmlns:w="urn:schemas-microsoft-com:office:word" href="#" style="height:42px;v-text-anchor:middle;width:198px;" arcsize="19%" stroke="t" strokecolor="#000000" strokeweight="1px" fillcolor="#ffffff">
+                  <w:anchorlock/>
+                  <center style="color:#000000;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;">Mehr erfahren</center>
+                  </v:roundrect>
+                  <![endif]-->
+                  <!--[if !mso]><!-->
+                  <a href="#" target="_blank" style="background-color:#ffffff;border:1px solid #000000;border-radius:4px;color:#000000;display:inline-block;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:500;letter-spacing:0.01em;line-height:42px;text-align:center;text-decoration:none;width:198px;-webkit-text-size-adjust:none;mso-hide:all;">Mehr erfahren</a>
+                  <!--<![endif]-->
+                </td>
+              </tr>
+            </table>
+
+            <!-- ---- Image ----
+                 Fluid width (100%, capped by the card's own padding) with explicit height left to
+                 "auto" and a server-known intrinsic width/height pair below -- Outlook needs the
+                 width attribute (not just CSS) to reserve correct space before the image loads
+                 (many clients block remote images by default). -->
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 32px;">
+              <tr>
+                <td>
+                  <img src="email-content-photo.png" width="520" alt="Beispielbild" style="display:block;width:100%;max-width:520px;height:auto;border:0;border-radius:8px;" />
+                </td>
+              </tr>
+            </table>
+
+            <!-- ---- Sign-off ----
+                 Last content paragraph before the footer -- names the sender as a team, not just
+                 the org, so the footer below (legal/contact identity) doesn't have to double as
+                 the only "who sent this" signal. -->
+            <p style="margin:0;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.6;color:#000000;">
+              Dein Team von<br>Velofreundliches Wetzikon
+            </p>
+
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+  <!-- ============================== FOOTER ============================== -->
+  <tr>
+    <td class="email-padded" style="padding:24px 32px 40px;text-align:center;font-family:Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:1.6;color:#8a8a86;">
+      Velofreundliches Wetzikon &mdash; private Initiative<br>
+      Thom Hoffmann &middot; Messikommerstrasse 37 &middot; 8620 Wetzikon<br>
+      <a href="https://velofreundliches-wetzikon.ch/impressum-editor/?utm_source=velomelder&amp;utm_medium=email&amp;utm_campaign=meldung_bestaetigung&amp;utm_content=impressum" style="color:#8a8a86;text-decoration:underline;">Impressum</a>
+    </td>
+  </tr>
+
+</table>
+<!--[if mso]></td></tr></table><![endif]-->
+</center>
+</body>
+</html>
