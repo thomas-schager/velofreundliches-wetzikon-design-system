@@ -87,7 +87,10 @@
 
   <!-- ============================== HEADER / LOGO ============================== -->
   <tr>
-    <td class="email-padded" style="padding:32px 32px 24px;" align="left">
+    <!-- Left/right 41px, not 40px -- matches the card's own content inset exactly: 1px border +
+         40px padding on the card below, so the logo and the body text line up on the same left
+         edge instead of sitting 9px apart. -->
+    <td class="email-padded" style="padding:32px 41px 24px;" align="left">
       <!-- PLACEHOLDER 1/4: relative path for local preview only -- must be an absolute,
            per-environment URL once this lives in a Twig template (see email.html → "Logo-URL"). -->
       <!-- PLACEHOLDER 4/4: utm_campaign -- see the file-level comment above. -->
