@@ -100,6 +100,9 @@ body {
       <a href="#el-positions">velo_positions</a>
       <a href="#el-join">velo_join</a>
       <a href="#el-tabs">velo_tabs</a>
+      <a href="#el-park-test">velo_park_test</a>
+      <a href="#el-gallery">velo_gallery</a>
+      <a href="#el-feature-photo">velo_feature_photo</a>
       <a href="#callouts">velo_callout (Text-Vorlage)</a>
     </div>
     <div class="sg-nav-group">
@@ -181,8 +184,11 @@ body {
     <div class="sg-preview--dark" style="padding:20px 28px;"><span class="vw-eyebrow vw-eyebrow--accent">Newsletter</span></div>
   </div>
   <div class="sg-component">
-    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-lead</span><span class="sg-badge sg-badge--label">Roboto 400 · 22px · lh-relaxed · color-text-muted</span></div>
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-lead</span><span class="sg-badge sg-badge--label">Roboto 400 · 18px → 22px ab 600px · lh-relaxed · color-text-muted</span></div>
     <div class="sg-preview--white"><p class="vw-lead">Wir setzen uns für sichere Velowege, gut ausgeschilderte Routen und ausreichend Abstellplätze ein.</p></div>
+    <p class="sg-note">Mobile-first (2026-10): die feste 22px wirkte auf schmalen Screens deutlich grösser
+    als der umliegende 18px-Fliesstext und nahm unverhältnismässig viel vertikalen Platz ein.
+    Jetzt 18px bis 600px, danach 22px — gleiches Breakpoint-Muster wie <code>.vw-section</code>.</p>
   </div>
 </section>
 
@@ -534,6 +540,235 @@ body {
         <p style="color:var(--color-text-muted);margin-top:12px;">Inhalt des aktiven Tabs. Jedes Tab wird als eigenständiger HTML-Block im multiColumnWizard hinterlegt.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- velo_park_test -->
+<section class="sg-section" id="el-park-test">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Veloparkplatz-Testbericht</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_park_test</span>
+    <span class="sg-badge sg-badge--css">.vw-parktest · .vw-highlight-list · .vw-card--campaign</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_park_test.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloParkTestController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">
+    Felder: <code>headline</code> (h2) · <code>velo_lead</code> · <code>velo_pt_highlights</code>
+    (multiColumnWizard: Einordnung +/~/–, Text) · <code>velo_pt_explanation</code> (RTE) ·
+    <code>velo_pt_note</code> · 6× Kriterien-Select · <code>velo_pt_address/lat/lng</code>
+    (Leaflet-Karte, Street/Satellit-Toggle, selbe Konfiguration wie VeloWetzikon_Backend's
+    Detail-Karte). Grid: 1.3fr Haupt­spalte / 1fr Karte ab 960px, Karte zuerst auf Mobile
+    direkt nach Lead. Vertikaler Rhythmus: siehe <a href="tokens.html#vertical-rhythm" style="color:var(--color-primary);">tokens.html#vertical-rhythm</a>.
+    <br><br>
+    <strong>Kriterien in zwei Gruppen (2026-10):</strong> die sechs Kriterien sind inhaltlich in
+    "Lage &amp; Erreichbarkeit" (Anfahrt, Wege zu Eingang/Einkaufswagen) und "Vor Ort" (Platz,
+    Auslastung, Wetterschutz) unterteilt — ein Gruppen-Label pro Dreiergruppe, gleicher visueller
+    Stil wie das bestehende "NOTE"-Label (uppercase, gedämpft, <code>tracking-wide</code>), keine
+    zusätzliche Abstandsregel zwischen den Gruppen nötig, da der bestehende
+    <code>margin-bottom</code> der Liste (24px) den Zeilenabstand innerhalb einer Gruppe (8px)
+    schon deutlich übersteigt. Datenstruktur im Controller: <code>criteria_groups</code>
+    (Array aus Gruppen mit <code>label</code> + <code>items</code>) statt einer flachen Liste.
+  </div>
+  <div class="sg-preview--fullbleed" style="padding:28px 32px;">
+    <div class="vw-card vw-card--campaign" style="max-width:360px;">
+      <div class="vw-parktest__note">
+        <span class="vw-parktest__note-label">Note</span>
+        <span class="vw-parktest__note-value" style="color:var(--color-rate-4);">4.75</span>
+      </div>
+      <span class="vw-parktest__criteria-group-label">Lage &amp; Erreichbarkeit</span>
+      <ul class="vw-parktest__criteria">
+        <li><span>Erreichbarkeit, Anfahrt</span><strong>gut</strong></li>
+        <li><span>Schritte bis zum Eingang</span><strong>&lt;50</strong></li>
+      </ul>
+      <span class="vw-parktest__criteria-group-label">Vor Ort</span>
+      <ul class="vw-parktest__criteria">
+        <li><span>Platz für Veloanhänger &amp; Cargobikes</span><strong>ja</strong></li>
+        <li><span>Ausreichend Plätze während Stosszeiten</span><strong>teils</strong></li>
+      </ul>
+    </div>
+    <ul class="vw-highlight-list" style="max-width:420px;margin-top:20px;">
+      <li class="vw-highlight-list__item vw-highlight-list__item--negative">
+        <span class="vw-highlight-list__mark" aria-hidden="true"><i data-lucide="x" width="20" height="20"></i></span>
+        <span>Einige Autoparkplätze sind näher beim Haupteingang</span>
+      </li>
+      <li class="vw-highlight-list__item vw-highlight-list__item--positive">
+        <span class="vw-highlight-list__mark" aria-hidden="true"><i data-lucide="check" width="20" height="20"></i></span>
+        <span>Mit dem Einkaufswagen kommt man direkt zum Velo</span>
+      </li>
+    </ul>
+    <p class="sg-note">Stacking-Context-Falle (2026-10): die Leaflet-Karte und ihr
+    Street/Satellit-Toggle hatten beide <code>position:relative</code> ohne eigenen
+    <code>z-index</code> — dadurch keine echte Stacking-Context-Grenze, und Leaflets interne
+    Ebenen (bis <code>z-index:700</code> fürs Popup) bzw. der Toggle (<code>z-index:1000</code>)
+    konkurrierten direkt mit dem Sticky-Header (<code>z-index:100</code>) beim Scrollen, statt
+    in der Karte eingeschlossen zu bleiben. Fix: <code>z-index:0</code> auf
+    <code>.vw-parktest__map</code> und <code>.vw-parktest__map-wrap</code> ergänzt.</p>
+  </div>
+</section>
+
+<!-- velo_gallery -->
+<section class="sg-section" id="el-gallery">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Foto-Galerie</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_gallery</span>
+    <span class="sg-badge sg-badge--css">.vw-gallery · .vw-lightbox</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_gallery.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloGalleryController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">
+    Felder: <code>headline</code> (h2, optional) · <code>velo_gallery_images</code>
+    (multiColumnWizard: Foto per fileTree, Alt-Text; min. 2). Hauptfoto + Thumbnail-Leiste,
+    Klick aufs Hauptfoto öffnet Lightbox (natives <code>&lt;dialog&gt;</code>) mit Vor/Zurück.
+    Gleiches Grundmuster wie VeloWetzikon_Backend's <code>.detail-gallery</code>
+    (velomelder-gelbes-band.html) — dort auf dieses Projekt übertragen, da hier bisher
+    <strong>nicht dokumentiert</strong> war. Einfacher Anwendungsfall: «hier sind die Fotos»,
+    ohne Kommentar zu einem einzelnen Foto — dafür siehe velo_feature_photo unten.
+  </div>
+  <div class="sg-preview--fullbleed" style="padding:28px 32px;">
+    <div class="vw-gallery__body" style="max-width:520px;">
+      <div class="vw-gallery__main-wrap">
+        <div class="vw-gallery__main" style="height:260px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.4);font:400 12px var(--font-body);">Hauptfoto</div>
+      </div>
+      <div class="vw-gallery__thumbs">
+        <div class="vw-gallery__thumb active" style="width:72px;height:72px;background:var(--color-border-strong);"></div>
+        <div class="vw-gallery__thumb" style="width:72px;height:72px;background:var(--color-border-strong);opacity:0.6;"></div>
+        <div class="vw-gallery__thumb" style="width:72px;height:72px;background:var(--color-border-strong);opacity:0.6;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- velo_feature_photo -->
+<section class="sg-section" id="el-feature-photo">
+  <div class="sg-section__title">Contao-Element</div>
+  <div class="sg-h">Foto mit Beschreibung (Figure &amp; Caption)</div>
+  <div class="sg-component__labels" style="margin-bottom:16px;">
+    <span class="sg-badge sg-badge--contao">velo_feature_photo</span>
+    <span class="sg-badge sg-badge--css">.vw-feature-photo</span>
+    <span class="sg-badge sg-badge--tpl">content_element/velo_feature_photo.html.twig</span>
+    <span class="sg-badge sg-badge--php">VeloFeaturePhotoController.php</span>
+  </div>
+  <div style="font:400 12px var(--font-body);color:var(--color-muted);margin-bottom:16px;">
+    Felder: <code>headline</code> (h3) · <code>velo_eyebrow</code> · <code>velo_fp_text</code>
+    (RTE, 2-3 Absätze oder eine Liste) · <code>velo_fp_image/alt</code>. Für ein Foto mit eigenem
+    Kommentar (nicht für eine reine Foto-Sammlung ohne Einzel-Captions — dafür velo_gallery).
+    <br><br>
+    <strong>Design-Historie (zwei Runden, je mit Vergleichsdateien ausserhalb dieses Repos
+    diskutiert):</strong> Runde 1 war eine <code>.vw-card</code>-Umsetzung (Rahmen, Schatten,
+    rechtsbündig, 65% Breite, Foto/Text 50/50) — verworfen, weil sie wie ein klickbares Element
+    aussah, aber keinen Link hatte und das Foto selbst nicht anklickbar war. Fünf Alternativen
+    wurden verglichen; gewählt wurde <strong>"Figure &amp; Caption"</strong> — kein Rahmen, kein
+    Hintergrund am Foto selbst, grosses Bild mit schlichter Caption darunter (dokumentarischer
+    Stil, keinerlei Interaktions-Erwartung).
+    <br><br>
+    Runde 2 klärte die <strong>Platzierung</strong>: nicht einzeln verstreut im Fliesstext,
+    sondern mehrere direkt hintereinander wie eine Galerie, aber jede Kachel mit eigener
+    Caption. Bewusst <strong>ohne Wrapper-Element</strong> — Redaktor:innen platzieren einfach
+    mehrere <code>velo_feature_photo</code> hintereinander, kein zusätzliches "Container"-Element
+    nötig. Technisch gelöst über <code>float</code> + <code>:nth-child(odd/even of
+    .content-velo-feature-photo)</code> (CSS Selectors L4 — zählt Position nur unter
+    gleichartigen Geschwistern, robust auch falls andere Elemente dazwischenstehen): bildet ab
+    640px automatisch ein 2-spaltiges Grid, jede Kachel mit <code>--color-surface-2</code>-Hintergrund,
+    damit eine Gruppe als ein zusammengehöriger, auffallender Abschnitt wirkt statt als lose
+    Elemente. Eine einzelne Kachel (kein Nachbar vom selben Typ) bleibt volle Breite statt
+    halb mit Leerraum daneben.
+    <br><br>
+    Runde 3 (2026-10) machte das Foto selbst <strong>anklickbar</strong>: öffnet, wie bei
+    <a href="#el-gallery" style="color:var(--color-primary);">velo_gallery</a>, im selben
+    nativen <code>&lt;dialog&gt;</code>-Lightbox-Grundmuster (<code>.vw-lightbox</code>,
+    <code>showModal()</code>), nur ohne Vor/Zurück, da immer nur ein Foto. Caption wird beim
+    Öffnen mitgezeigt. Die Lightbox selbst ist eine <strong>verbundene Form</strong> statt zweier
+    getrennter Blöcke: Foto bildet randabschneidend den oberen Teil des Rahmens
+    (<code>.vw-lightbox__figure</code> trägt Hintergrund/Radius/Schatten selbst, nicht das Foto),
+    Caption direkt darunter mit eigener Polsterung — gewählt nach einem Vergleich von invertierten
+    (dunkel) vs. Original-Farben (hell) sowie zwei "verbunden"-Varianten (randabschneidend vs.
+    eingerückt wie die statische Caption); hell + randabschneidend gewann. Bild wird
+    <strong>nie beschnitten</strong> — <code>width/height:auto</code>, nur durch
+    <code>max-width/max-height</code> begrenzt, Rahmen und Dialog passen sich der tatsächlichen
+    Bildhöhe an statt umgekehrt.
+    <br><br>
+    <strong>Zoom:</strong> Pinch-to-Zoom ist von Hand implementiert (<code>transform:scale()</code>
+    + <code>touchstart/move/end</code>), nicht nativem Browser-Pinch überlassen — ein
+    <code>&lt;dialog&gt;</code> wird vom Browser per Default-Stylesheet als
+    <code>position:fixed</code> gerendert, und mobile Browser (v.a. iOS Safari) skalieren
+    <code>position:fixed</code>-Inhalte grundsätzlich nicht mit nativem Pinch; kein
+    <code>touch-action</code>-Wert ändert das. Zusätzlich: Ein-Finger-Pan sobald gezoomt,
+    Doppeltipp zum Umschalten 1×/2× (max. 4×), Reset beim Schliessen. Touch-Listener sitzen
+    bewusst auf dem ganzen <code>.vw-lightbox__figure</code>-Rahmen statt nur auf dem
+    <code>&lt;img&gt;</code> — ein echter Zwei-Finger-Pinch landet selten exakt innerhalb der
+    Bildpixel, die Caption sitzt direkt darunter ohne Lücke; ein auf das Bild beschränkter
+    Listener verpasste Touches, die knapp daneben starteten, und der Browser übernahm dann doch
+    wieder sein (hier wirkungsloses) natives Zoom für die ganze Geste.
+    <br><br>
+    <strong>Trackpad &amp; Maus (Desktop):</strong> ein Trackpad-Pinch feuert nie
+    <code>touchstart</code>/<code>touchmove</code> — Safari übersetzt es in eigene
+    <code>gesturestart/change/end</code>-Events (<code>e.scale</code>), Chrome/Firefox/Edge in
+    <code>wheel</code>-Events mit <code>ctrlKey:true</code> (dasselbe Signal wie echtes
+    Ctrl+Scroll — <code>preventDefault()</code> nötig, sonst zoomt der Browser die ganze Seite
+    statt nur das Foto). Beide Pfade zusätzlich zu Touch implementiert. Gezoomt kann zudem mit
+    gehaltener linker Maustaste verschoben werden (<code>mousemove</code>/<code>mouseup</code>
+    bewusst auf <code>window</code>, nicht auf dem Rahmen, damit das Draggen auch weiterläuft,
+    wenn der Cursor den Bildbereich kurz verlässt) — Cursor wechselt zwischen
+    <code>grab</code>/<code>grabbing</code> als Feedback.
+    <br><br>
+    <strong>Zoom-Buttons:</strong> zwei immer sichtbare +/−-Buttons unten rechts auf dem Foto
+    verankert (nicht im Dialog fixiert) — bewusst statt eines einmaligen "Pinch to zoom"-Hinweises:
+    funktionieren für jede Eingabeart (auch reine Maus ohne jede Gesten-Unterstützung) und sind
+    selbst schon die visuelle Information, dass Zoom möglich ist. Deaktivieren sich an den
+    Grenzen (1× / 4×) — erster Entwurf graute dafür den <em>ganzen</em> Button aus, was ihn auf
+    unruhigen/dunklen Fotos fast unsichtbar machte; korrigiert, sodass der dunkle Kreis immer
+    lesbar bleibt und nur das Icon selbst dimmt.
+  </div>
+  <div class="sg-preview--fullbleed" style="padding:28px 32px;">
+    <div style="display:flex; gap:32px;">
+      <figure class="vw-feature-photo" style="margin:0; flex:1;">
+        <div style="width:100%;aspect-ratio:16/9;background:var(--color-border-strong);border-radius:var(--radius-sm);"></div>
+        <figcaption>
+          <span class="vw-eyebrow">Haupteingang</span>
+          <h3>Direkt neben dem Eingang, aber enger Durchgang</h3>
+          <div class="vw-feature-photo__text"><p>Gute Erreichbarkeit und kurze Wege zu den Einkaufswagen — bei Stosszeiten wird es zwischen den Reihen aber schnell eng.</p></div>
+        </figcaption>
+      </figure>
+      <figure class="vw-feature-photo" style="margin:0; flex:1;">
+        <div style="width:100%;aspect-ratio:16/9;background:var(--color-border-strong);border-radius:var(--radius-sm);"></div>
+        <figcaption>
+          <span class="vw-eyebrow">Im Detail</span>
+          <h3>Seiteneingang: näher dran, aber kein Wetterschutz</h3>
+          <div class="vw-feature-photo__text"><p>Die Parkplätze beim Seiteneingang haben gar keinen Wetterschutz und mit Veloanhängern auf beiden Seiten würde es eng.</p></div>
+        </figcaption>
+      </figure>
+    </div>
+    <p class="sg-note">Vereinfachte Vorschau (Flexbox statt des echten Float-Mechanismus, damit sie
+    innerhalb dieser Doku-Seite nicht mit anderen Elementen interferiert) — reales Verhalten live
+    auf der Seite "Veloparkplätze Migros-Färberwiese" sichtbar.</p>
+  </div>
+
+  <div class="sg-component" style="margin-top:20px;">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-lightbox__figure · .vw-lightbox__img-wrap · .vw-lightbox__zoom-controls</span></div>
+    <div class="sg-preview--dark" style="padding:40px 32px;display:flex;justify-content:center;">
+      <figure class="vw-lightbox__figure" style="margin:0;max-width:360px;">
+        <div class="vw-lightbox__img-wrap">
+          <div style="width:100%;aspect-ratio:16/9;background:var(--color-border-strong);"></div>
+          <div class="vw-lightbox__zoom-controls">
+            <button type="button" class="vw-lightbox__zoom-btn" disabled aria-label="Verkleinern"><i data-lucide="zoom-out" width="18" height="18"></i></button>
+            <button type="button" class="vw-lightbox__zoom-btn" aria-label="Vergrössern"><i data-lucide="zoom-in" width="18" height="18"></i></button>
+          </div>
+        </div>
+        <figcaption class="vw-lightbox__caption">
+          <span class="vw-eyebrow">Haupteingang</span>
+          <h3>Direkt neben dem Eingang, aber enger Durchgang</h3>
+          <div class="vw-feature-photo__text"><p>Gute Erreichbarkeit und kurze Wege zu den Einkaufswagen — bei Stosszeiten wird es zwischen den Reihen aber schnell eng.</p></div>
+        </figcaption>
+      </figure>
+    </div>
+    <p class="sg-note">Lightbox-Vorschau (verbundene Form, randabschneidendes Foto + gepolsterte
+    Caption, gemeinsamer Hintergrund/Radius/Schatten auf dem Rahmen). Zoom-Buttons rechts unten am
+    Foto verankert, der linke (− / minimale Grenze) hier im deaktivierten Zustand gezeigt — der
+    dunkle Kreis bleibt bewusst voll sichtbar, nur das Icon dimmt. Echtes Verhalten (Pinch, Pan,
+    Trackpad, Maus-Drag) nur im echten <code>&lt;dialog&gt;</code> auf der Live-Seite testbar,
+    nicht in dieser statischen Doku-Vorschau.</p>
   </div>
 </section>
 

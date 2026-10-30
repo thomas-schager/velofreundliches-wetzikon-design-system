@@ -1,14 +1,4 @@
 /*
- * SNAPSHOT — copied verbatim from VeloWetzikon_Contao's files/themes/velo/css/site.css
- * on 2026-08-17, for the human-readable implementation overview in this folder only.
- *
- * This is NOT a canonical/shared file (unlike ../tokens.css) and is not meant to be consumed
- * by any application. Component CSS stays owned by the Contao repo per
- * design-system-sharing-strategy.md ("What moves, what doesn't") — only the design *tokens*
- * (colors, spacing, type scale, etc.) are shared source-of-truth here. If this drifts from the
- * live file, that's expected over time; re-copy it when refreshing this documentation rather
- * than editing it in place, and don't treat it as authoritative for anything but this preview.
- *
  * Velofreundliches Wetzikon — Component & Layout CSS
  * Mobile-first. Breakpoints: 600px (tablet) / 720px (strip) / 960px (desktop)
  * Requires colors_and_type.css to be loaded first.
@@ -931,5 +921,508 @@
   padding-inline: var(--gutter);
 }
 
+/* Vertical rhythm between separate content elements stacked in an article (e.g. two images
+   back to back, a text block followed by an image) -- see colors_and_type.css's heading rules
+   and design-system/tokens.html#vertical-rhythm in the design-tokens repo for the full
+   principle. Every content element Contao renders gets a "content-<type>" wrapper class
+   (vendor's content_element/_base.html.twig), so this targets any two such wrappers that are
+   adjacent siblings -- a "lobotomized owl" selector, deliberately margin-top-only so gaps never
+   double up regardless of which two element types happen to be adjacent.
+   Excludes content-velo-* (same distinction the gutter-breakout rule above already draws):
+   those are full bespoke sections (hero, melde, positions, join, newsletter, tabs, park_test)
+   that manage their own spacing via padding-block on an internal .vw-section wrapper, not
+   margin -- this rule is only meant to backfill plain content types (text/image/html/...) that
+   don't have any spacing of their own. Applying it unconditionally caused double-spacing on
+   the homepage (melde/positions each picked up an extra unwanted 32px on top of their own
+   already-tuned padding). */
+.mod_article > [class*="content-"]:not([class*="content-velo-"]) + [class*="content-"]:not([class*="content-velo-"]) { margin-top: var(--space-6); }
+
 /* Contao article default */
 .mod_article { padding-block: 0; }
+
+/* ============================================================
+   PARK TEST REPORT (velo_park_test)
+   Main column: besonderheiten highlights + explanation.
+   Sidebar: note/criteria/map card. Stacked "card first" on mobile via grid-template-areas,
+   side-by-side on desktop -- see the area swap in the 960px breakpoint below.
+   ============================================================ */
+
+/* Mobile-first: a flat --space-7 (48px) here stacked on top of .vw-main's own 24px top padding
+   made for 72px of empty space above the heading on narrow screens -- .vw-main and .vw-section
+   both already scale their own spacing down for mobile, this didn't. Same breakpoint/scale as
+   those two now, just one step lower to start (this section sits directly under .vw-main's own
+   padding, not on bare page background like .vw-section). */
+.vw-parktest { margin-top: var(--space-6); margin-bottom: var(--space-6); }
+@media (min-width: 600px) {
+  .vw-parktest { margin-top: var(--space-7); margin-bottom: var(--space-7); }
+}
+
+.vw-parktest__grid {
+  display: grid;
+  /* explicit single track at exactly the container's width -- without this, an implicit
+     max-content-sized column (Grid's default) can grow wider than the viewport and overflow
+     it horizontally instead of wrapping its content */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  /* Mobile reading order: heading+lead, then besonderheiten highlights (+/~/-) as part of the
+     quick-glance summary, then the card, then the longer free-text explanation last. */
+  grid-template-areas: "lead" "highlights" "card" "explanation";
+}
+@media (min-width: 960px) {
+  .vw-parktest__grid {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+    /* "card" repeats across all three rows of the second column, so it automatically spans
+       the full height of the left column's three stacked pieces -- same mechanism as any
+       rectangular named-area span. */
+    grid-template-areas: "lead card" "highlights card" "explanation card";
+    align-items: start;
+    /* Explicit column/row gap, not the shorthand: lead/highlights/explanation now share the
+       left column (stacked across three grid rows), so a row-gap here would stack ON TOP OF
+       each block's own trailing margin between them -- row-gap stays 0, those margins are the
+       only thing controlling that spacing (restored below, zeroed on mobile where the grid's
+       own row-gap already provides it and grid items never collapse margins with siblings). */
+    column-gap: var(--space-8);
+    row-gap: 0;
+  }
+}
+
+.vw-parktest__lead-block { grid-area: lead; min-width: 0; }
+.vw-parktest__highlights-block { grid-area: highlights; min-width: 0; }
+.vw-parktest__explanation-block { grid-area: explanation; min-width: 0; }
+/* h2 margin-bottom now comes from the global vertical-rhythm rule (colors_and_type.css,
+   .mod_article h2), no separate override needed here. */
+/* Two-class selectors, not bare .vw-parktest__lead/.vw-highlight-list -- each is the last (or
+   only) child of its grid-item wrapper, so the global `p:last-child { margin-bottom: 0 }`
+   reset (colors_and_type.css) would otherwise win the lead paragraph's margin on specificity.
+   Zeroed by default (mobile: the grid's own row-gap provides the space instead), restored at
+   960px+ where row-gap is 0 and these margins become the only thing providing it. */
+.vw-parktest__lead-block .vw-parktest__lead,
+.vw-parktest__highlights-block .vw-highlight-list { margin-bottom: 0; }
+@media (min-width: 960px) {
+  .vw-parktest__lead-block .vw-parktest__lead,
+  .vw-parktest__highlights-block .vw-highlight-list { margin-bottom: var(--space-6); }
+}
+
+.vw-parktest__card {
+  grid-area: card;
+  padding: 24px;
+  /* grid items default to min-width:auto, which refuses to shrink below the content's
+     intrinsic width (e.g. the criteria rows) and overflows the viewport on mobile -- see
+     .vw-parktest__main below for the same fix on the other column */
+  min-width: 0;
+}
+@media (min-width: 600px) {
+  /* a little wider than a regular .vw-card--campaign (24px/28px) -- this one carries a note,
+     six criteria and a map, so it needs the extra breathing room once there's space for it */
+  .vw-parktest__card { padding: 28px 32px; }
+}
+@media (min-width: 960px) {
+  .vw-parktest__card { position: sticky; top: var(--space-6); }
+}
+
+.vw-parktest__note { text-align: center; margin-bottom: var(--space-5); }
+.vw-parktest__note-label {
+  display: block;
+  font: 600 var(--text-sm) var(--font-body);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-label-muted);
+  margin-bottom: var(--space-1);
+}
+.vw-parktest__note-value { font: 700 var(--text-4xl) var(--font-display); line-height: var(--lh-tight); }
+
+/* Group label, same visual treatment as .vw-parktest__note-label above it (uppercase, tracked,
+   muted) so it reads as part of the same card's design language. No extra margin/gap rule is
+   needed between the two groups themselves -- .vw-parktest__criteria's own margin-bottom below
+   (24px) already comfortably exceeds the 8px row spacing within a group, which is exactly the
+   "more space between groups than between rows" effect that was asked for. */
+.vw-parktest__criteria-group-label {
+  display: block;
+  font: 600 var(--text-sm) var(--font-body);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-label-muted);
+  margin-bottom: var(--space-2);
+}
+.vw-parktest__criteria { list-style: none; margin: 0 0 var(--space-5); padding: 0; }
+.vw-parktest__criteria li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--space-1) var(--space-3);
+  padding-block: var(--space-2);
+  border-bottom: 1px solid var(--color-border);
+  font: 400 var(--text-sm) var(--font-body);
+}
+.vw-parktest__criteria li:last-child { border-bottom: none; }
+.vw-parktest__criteria li span { color: var(--color-text-muted); }
+.vw-parktest__criteria li strong { font-weight: 600; text-align: right; white-space: nowrap; }
+
+/* Same stacking-context issue as .vw-parktest__map below, one level up: position:relative alone
+   doesn't make this a real stacking context, so the toggle's z-index:1000 (needed to sit above
+   the map/satellite tiles) was escaping to compete directly with .vw-nav's sticky header
+   (z-index:100) instead of staying contained in here. */
+.vw-parktest__map-wrap { position: relative; z-index: 0; }
+.vw-parktest__map {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  background: var(--color-surface-2);
+  /* Leaflet's own CSS gives this element (the map container itself -- L.map() is handed this
+     div directly) position:relative but no z-index, so it never becomes a real stacking
+     context: Leaflet's internal panes (tile/marker/tooltip/popup, up to z-index:700 for popups)
+     then compare directly against ancestors elsewhere on the page instead of staying contained
+     here, and were winning against .vw-nav's sticky header (z-index:100) while scrolled. Adding
+     a z-index turns this into a genuine stacking context boundary, so everything inside is
+     contained here regardless of how high Leaflet's own internal values go.
+  */
+  position: relative;
+  z-index: 0;
+}
+/* Same street/satellite toggle design as .preview-map-toggle/.preview-toggle-btn in
+   VeloWetzikon_Backend's velomelder-gelbes-band.html -- identical token values except
+   --vw-dark (#3a3a3a), which has no equivalent in this site's token set and is kept literal
+   to match the active-button color exactly. */
+.vw-parktest__map-toggle {
+  position: absolute; bottom: 8px; right: 8px; z-index: 1000;
+  display: flex; border: 1px solid var(--color-border-strong); border-radius: var(--radius-sm);
+  overflow: hidden; box-shadow: var(--shadow-md);
+}
+.vw-parktest__map-toggle-btn {
+  padding: 11px 14px; min-height: 44px;
+  font: 500 var(--text-xs) var(--font-body);
+  background: var(--color-surface); color: var(--color-text-muted);
+  border: none; cursor: pointer; white-space: nowrap;
+  transition: background var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.vw-parktest__map-toggle-btn + .vw-parktest__map-toggle-btn { border-left: 1px solid var(--color-border); }
+.vw-parktest__map-toggle-btn.active { background: #3a3a3a; color: #fff; }
+.vw-parktest__map-toggle-btn:hover:not(.active) { background: var(--color-surface-2); color: var(--color-text); }
+.vw-parktest__address { margin-top: var(--space-2); font: 400 var(--text-xs) var(--font-body); color: var(--color-text-muted); text-align: center; }
+.vw-parktest-pin { width: 24px; height: 32px; }
+.vw-parktest-pin svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22)); }
+
+/* Besonderheiten highlights -- same visual language as .vw-callout elsewhere on this site:
+   a subtle tint + colored left border, not a solid full-bleed block (that read as flat,
+   dated "red/green panels" rather than a refined UI). Icon instead of a filled badge circle,
+   for the same reason. Generous padding/gaps -- this replaces the thumbs-up/down emoji. */
+.vw-highlight-list { list-style: none; margin: 0 0 var(--space-6); padding: 0; display: flex; flex-direction: column; gap: var(--space-3); }
+.vw-highlight-list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  border-left: 3px solid transparent;
+  font: 400 var(--text-base) var(--font-body);
+  line-height: var(--lh-normal);
+}
+.vw-highlight-list__mark {
+  flex-shrink: 0;
+  display: inline-flex;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+}
+.vw-highlight-list__mark svg { width: 100%; height: 100%; }
+.vw-highlight-list__item--positive { background: rgba(41,99,16,0.06); border-left-color: var(--color-success); }
+.vw-highlight-list__item--positive .vw-highlight-list__mark { color: var(--color-success); }
+.vw-highlight-list__item--negative { background: rgba(220,52,6,0.06); border-left-color: var(--color-danger); }
+.vw-highlight-list__item--negative .vw-highlight-list__mark { color: var(--color-danger); }
+.vw-highlight-list__item--neutral { background: rgba(202,138,4,0.06); border-left-color: var(--color-rate-3); }
+.vw-highlight-list__item--neutral .vw-highlight-list__mark { color: var(--color-rate-3); }
+
+.vw-parktest__explanation { color: var(--color-text-muted); font-size: var(--text-base); }
+.vw-parktest__explanation p { margin-bottom: var(--space-4); }
+.vw-parktest__explanation a { color: var(--color-primary); }
+
+/* ============================================================
+   GALLERY (velo_gallery) -- main photo + thumbnail strip + lightbox.
+   Same pattern as VeloWetzikon_Backend's .detail-gallery (velomelder-gelbes-band.html),
+   documented at design-system/tokens.html#gallery in the design-tokens repo.
+   ============================================================ */
+
+.vw-gallery { margin-top: var(--space-7); margin-bottom: var(--space-7); }
+.vw-gallery h2 { margin-bottom: var(--space-4); }
+
+.vw-gallery__body { display: flex; flex-direction: column; gap: var(--space-2); }
+.vw-gallery__main-wrap { min-width: 0; }
+.vw-gallery__main {
+  width: 100%;
+  max-height: 420px;
+  object-fit: contain;
+  background: #111;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  display: block;
+}
+.vw-gallery__thumbs {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2);
+  overflow-x: auto;
+  padding-bottom: 2px;
+  -webkit-overflow-scrolling: touch;
+}
+.vw-gallery__thumb {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  cursor: pointer;
+  opacity: 0.7;
+  background: none;
+  transition: opacity var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.vw-gallery__thumb img { display: block; width: 72px; height: 72px; object-fit: cover; }
+.vw-gallery__thumb:hover { opacity: 1; }
+.vw-gallery__thumb.active { opacity: 1; border-color: var(--color-primary); }
+
+@media (min-width: 600px) {
+  .vw-gallery__body { flex-direction: row; align-items: flex-start; }
+  .vw-gallery__main-wrap { flex: 1 1 auto; }
+  .vw-gallery__main { max-height: 480px; }
+  .vw-gallery__thumbs {
+    flex-direction: column;
+    overflow-x: visible;
+    overflow-y: auto;
+    padding-bottom: 0;
+    flex: 0 0 88px;
+    max-height: 480px;
+  }
+  .vw-gallery__thumb img { width: 100%; height: 72px; }
+}
+
+/* Lightbox -- native <dialog>, same chrome as the Backend's .photo-viewer (top-layer handles
+   stacking/backdrop/focus-trap/Escape, no manual z-index coordination needed).
+   display:flex is scoped to [open] -- a closed <dialog> is display:none by default via the UA
+   stylesheet, but an unconditional author `display` rule overrides that default (author styles
+   always win over UA styles), which left the dialog -- including its position:fixed close
+   button -- rendered inline on every page load despite dialog.open being false. [open] (set by
+   JS via showModal()/close()) keeps display:none as the real default and only switches to flex
+   once the dialog is actually shown. Flex column so velo_feature_photo can stack an optional
+   caption below the image; velo_gallery's lightbox only ever has the <img> as a child, so this
+   is a no-op there (a single flex item just centers, same as before). */
+.vw-lightbox {
+  border: none; padding: 0; background: transparent; max-width: 94vw; max-height: 94vh; overflow: visible; z-index: 5000;
+}
+.vw-lightbox[open] { display: flex; flex-direction: column; align-items: center; gap: var(--space-4); }
+.vw-lightbox::backdrop { background: rgba(0, 0, 0, 0.82); }
+.vw-lightbox__img { display: block; max-width: 92vw; max-height: 88vh; border-radius: var(--radius-md); box-shadow: var(--shadow-lg); }
+
+/* velo_feature_photo's lightbox: image + caption connected into one shape (chosen after a
+   design comparison round -- light original colors, "Idea A": photo bleeds to the frame's
+   edges, caption padded below, one shared background/radius) instead of two separate floating
+   blocks. The <figure> IS the frame now (not a pure grouping wrapper), sharing
+   --color-surface-2 with the caption so the two read as one piece. */
+.vw-lightbox__figure {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  overflow: hidden; /* clips the image's top corners to the frame's own radius */
+  box-shadow: var(--shadow-lg);
+  max-width: 92vw;
+  /* touch-action:none has to cover the whole frame (image + caption), not just the <img>:
+     a real pinch rarely lands both fingers precisely inside the photo's own pixel box -- the
+     caption sits right below it with no gap. If either touch starts outside the <img>, our JS
+     listener on the image never fires, preventDefault() never happens for that touch, and the
+     browser's native page-zoom wins the gesture instead, fighting/overriding our transform.
+     Scoping to the whole frame (and listening here in JS too, see the content element's own
+     <script>) guarantees any two-finger touch anywhere on the photo/caption block is ours. */
+  touch-action: none;
+}
+/* Overrides the shared .vw-lightbox__img rule above: no separate radius/shadow once the image
+   is part of a connected frame (the frame itself carries those now). Crucially, width/height
+   stay auto (not 100%) -- the image is constrained by max-width/max-height only, so it always
+   renders at its own full, un-cropped aspect ratio, and the frame (and so the whole dialog)
+   shrink-wraps to whatever size that turns out to be, rather than a fixed-width frame
+   stretching or cropping the photo to fit. max-height is tighter than the gallery's standalone
+   88vh (68vh), leaving headroom within the dialog's own max-height:94vh for the caption below
+   -- so the full photo plus its caption are always guaranteed to fit on screen together. */
+.vw-lightbox__figure .vw-lightbox__img {
+  max-width: 92vw;
+  max-height: 68vh;
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  box-shadow: none;
+  /* touch-action:none also set on the parent .vw-lightbox__figure above (see there for why --
+     the frame, not just the image, needs to claim the gesture). Repeated here for the image
+     itself as a harmless belt-and-braces. */
+  touch-action: none;
+}
+/* Cursor feedback for mouse-drag panning once zoomed in: an open hand while draggable, a
+   closed one while actively dragging (left button held) -- .is-zoomed/.is-dragging are toggled
+   by the content element's own <script> alongside the scale/transform state. */
+.vw-lightbox__figure.is-zoomed .vw-lightbox__img { cursor: grab; }
+.vw-lightbox__figure.is-dragging .vw-lightbox__img { cursor: grabbing; }
+/* Overlaid zoom controls, anchored to the photo itself (not the dialog/viewport) so they stay
+   put over the bottom-right corner of the image regardless of its aspect ratio or the caption's
+   length below it. They're deliberately always visible rather than a one-off "pinch to zoom"
+   hint: a click-based control works for every input type (touch, trackpad, plain mouse with no
+   pinch gesture at all), and their presence alone communicates that zooming is possible. */
+.vw-lightbox__img-wrap { position: relative; }
+.vw-lightbox__zoom-controls {
+  position: absolute;
+  right: var(--space-3);
+  bottom: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+.vw-lightbox__zoom-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.vw-lightbox__zoom-btn:hover { background: rgba(0, 0, 0, 0.75); }
+/* Dimming the whole button at its scale limit made it nearly disappear against busier/darker
+   photos -- the dark circle itself needs to stay legible against any image, so only the icon
+   glyph dims to signal "can't go further"; the button's own backdrop opacity never changes. */
+.vw-lightbox__zoom-btn:disabled { cursor: not-allowed; }
+.vw-lightbox__zoom-btn:disabled i { opacity: 0.35; }
+.vw-lightbox__caption { padding: var(--space-5); text-align: left; }
+.vw-lightbox__caption .vw-eyebrow { color: var(--color-primary); margin-bottom: var(--space-1); }
+.vw-lightbox__caption h3 { color: var(--color-text); margin: var(--space-1) 0; font-size: var(--text-lg); }
+.vw-lightbox__caption .vw-feature-photo__text { color: var(--color-text-muted); }
+.vw-lightbox__close, .vw-lightbox__nav {
+  position: fixed;
+  border: none;
+  border-radius: var(--radius-full);
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.vw-lightbox__close:hover, .vw-lightbox__nav:hover { background: rgba(0, 0, 0, 0.7); }
+.vw-lightbox__close { top: 16px; right: 16px; width: 40px; height: 40px; }
+.vw-lightbox__nav { top: 50%; transform: translateY(-50%); width: 48px; height: 48px; }
+.vw-lightbox__nav--prev { left: 16px; }
+.vw-lightbox__nav--next { right: 16px; }
+
+/* ============================================================
+   FEATURE PHOTO (velo_feature_photo) -- "Figure & Caption" style, chosen after a 5-option
+   design review (plain photo + caption, no card chrome -- a bordered/shadowed card previously
+   made this look clickable when it wasn't). Meant to be placed directly one after another, no
+   wrapping element needed: consecutive instances automatically form a 2-up grid via float +
+   :nth-child(... of ...) (CSS Selectors L4, counts position among ONLY matching siblings, so
+   other content elements interleaved wouldn't throw off the odd/even pairing -- not that this
+   should happen in practice, but it's robust either way). Each tile gets a shared tinted
+   background so a run of them reads as one combined, standout section rather than loose
+   floats. A lone instance (no feature-photo sibling before or after) stays full width instead
+   of floating at half-width with empty space beside it. Documented at
+   design-system/tokens.html#feature-photo in the design-tokens repo.
+   ============================================================ */
+
+/* Stays within the normal reading column -- unlike most other velo_* sections, a grid of these
+   should never go full-bleed, so cancel the generic breakout rule near the top of this file
+   ([class*="content-velo-"] { margin-inline: calc(-1 * var(--gutter)); }). Same specificity
+   (one class vs. one attribute selector), so this only wins because it's declared later in the
+   file -- intentional, not incidental. */
+.content-velo-feature-photo { margin-inline: 0; margin-top: var(--space-6); }
+
+/* Vertical gap between stacked instances (mobile, or wrapped rows) -- tighter than the base
+   --space-6 above, so a run of these reads as one grouped section rather than independent
+   blocks with generous breathing room between them. */
+.content-velo-feature-photo + .content-velo-feature-photo { margin-top: var(--space-4); }
+.content-velo-feature-photo:first-child { margin-top: 0; }
+
+/* Floats don't push the elements around them the way normal block flow does: without this,
+   whatever follows a run of feature-photos flows into the horizontal space beside the floats
+   instead of dropping below them, overlapping visually. .mod_article::after's clearfix (above)
+   only fixes the *article's own total height* (so a footer after the whole article doesn't
+   overlap) -- it does nothing for a normal sibling immediately following the float run inside
+   the same article, which is the actual overlap this fixes. Targets "whatever comes right
+   after a feature-photo but isn't one itself" generically, without needing to know what that
+   element's type is.
+   padding-top, not margin-top, alongside clear: tried margin-top first, measured zero effect
+   (verified via computed position) -- when `clear` introduces clearance, a margin-top smaller
+   than the required clearance is absorbed into satisfying that clearance rather than adding on
+   top of it, per the CSS2 clearance algorithm, so the following element landed exactly flush
+   with the taller tile's bottom edge regardless of how large the margin was. Technically not
+   overlapping, but a tinted tile touching a solid-black section with zero breathing room reads
+   as overlapping. Padding isn't part of that clearance calculation at all, so it reliably adds
+   visible space no matter how tall the floated tiles turn out to be. */
+.content-velo-feature-photo + :not(.content-velo-feature-photo) { clear: both; padding-top: var(--space-7); }
+
+.vw-feature-photo {
+  margin: 0;
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+}
+.vw-feature-photo img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; display: block; border-radius: var(--radius-sm); }
+.vw-feature-photo figcaption { margin-top: var(--space-3); }
+.vw-feature-photo .vw-eyebrow { margin-bottom: var(--space-1); }
+/* Two-class selector so it beats the global vertical-rhythm default regardless of whether the
+   eyebrow precedes it (i.e. whether h3 is :first-child or not) -- a small, consistent gap
+   either way, see colors_and_type.css's heading rules for why this needs explicit handling. */
+.vw-feature-photo h3 { margin: var(--space-1) 0 var(--space-1); font-size: var(--text-lg); }
+.vw-feature-photo__text { color: var(--color-text-muted); font-size: var(--text-sm); }
+.vw-feature-photo__text p { margin-bottom: var(--space-3); }
+.vw-feature-photo__text p:last-child { margin-bottom: 0; }
+.vw-feature-photo__text ul { list-style: disc; padding-left: 1.1em; margin-bottom: var(--space-3); }
+.vw-feature-photo__text li { margin-bottom: var(--space-1); }
+
+@media (min-width: 640px) {
+  .content-velo-feature-photo { float: left; width: 100%; }
+  /* Column width = 50% minus HALF the gap (--space-6 / 2 = --space-4) on each side, so
+     col + gap + col sums to exactly 100% -- using --space-3 here (a left/right-eyed near-half)
+     overshoots by 8px and silently forces a wrap despite float:left being set correctly on
+     both (verified via computed styles while tracking this down: float/clear/width/margin were
+     all exactly as intended, the two just didn't fit on one line). */
+  .content-velo-feature-photo:nth-child(odd of .content-velo-feature-photo) {
+    width: calc(50% - var(--space-4));
+    margin-right: var(--space-6);
+    clear: left;
+  }
+  .content-velo-feature-photo:nth-child(even of .content-velo-feature-photo) {
+    width: calc(50% - var(--space-4));
+    margin-right: 0;
+  }
+  .content-velo-feature-photo:nth-child(1 of .content-velo-feature-photo):nth-last-child(1 of .content-velo-feature-photo) {
+    float: none;
+    width: 100%;
+    margin-right: 0;
+  }
+
+  /* Row pairing: the two tiles in a row MUST share the same margin-top or they misalign
+     vertically -- confirmed via computed styles: the stacked-mode adjacency rule above
+     (.content-velo-feature-photo + .content-velo-feature-photo) was still active at this
+     width, giving the second tile in a row 16px while the first kept 32px, offsetting the row
+     by exactly that 16px despite both floating correctly side by side otherwise. Position 1
+     and 2 (row 1) get the "entry into the group" gap; position 3 onward (row 2+) all share the
+     tighter inter-row gap, regardless of column -- correct for any number of wrapped rows,
+     since each new row's floats are pushed down by the previous row's bottom edge regardless
+     of which of the two columns they land in. */
+  .content-velo-feature-photo:nth-child(1 of .content-velo-feature-photo),
+  .content-velo-feature-photo:nth-child(2 of .content-velo-feature-photo) {
+    margin-top: var(--space-6);
+  }
+  .content-velo-feature-photo:nth-child(n+3 of .content-velo-feature-photo) {
+    margin-top: var(--space-4);
+  }
+  /* Higher specificity than the two rules above (adds :first-child), so the truly-first
+     element in the article still gets zero top margin even at this width -- the plain
+     :first-child rule above alone is specificity (0,2,0), which the nth-child(of) rules above
+     (0,3,0) would otherwise win against. */
+  .content-velo-feature-photo:nth-child(1 of .content-velo-feature-photo):first-child {
+    margin-top: 0;
+  }
+}
+
+/* Clearfix so whatever follows a run of floated feature-photos starts below them rather than
+   wrapping beside them -- standard, safe pattern, doesn't change .mod_article's own layout
+   mode (stays display:block). */
+.mod_article::after { content: ""; display: table; clear: both; }

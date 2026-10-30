@@ -99,6 +99,11 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: va
 .sg-bp-desc  { font: 400 12px var(--font-body); color: var(--color-text-muted); flex-shrink: 0; }
 
 .sg-note { font: 400 12px var(--font-body); color: var(--color-muted); margin-top: 10px; font-style: italic; }
+pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflow-x: auto; }
+.sg-rhythm-table { width: 100%; border-collapse: collapse; font: 400 13px var(--font-body); }
+.sg-rhythm-table th, .sg-rhythm-table td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--color-border); }
+.sg-rhythm-table th { font-weight: 600; color: var(--color-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
+.sg-rhythm-table td:first-child { font-family: monospace; }
 </style>
 </head>
 <body>
@@ -115,6 +120,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: va
       <a href="#colors">Farben</a>
       <a href="#typography-tokens">Typografie</a>
       <a href="#spacing">Abstände</a>
+      <a href="#vertical-rhythm">Vertikaler Rhythmus</a>
       <a href="#radii">Radien</a>
       <a href="#shadows">Schatten</a>
       <a href="#layout-tokens">Layout, Breakpoints, Motion</a>
@@ -250,6 +256,104 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--font-display); letter-spacing: va
     <div class="sg-space-row"><div class="sg-space-meta">--space-8 · 64px</div><div class="sg-space-bar" style="width:64px;height:20px;"></div></div>
     <div class="sg-space-row"><div class="sg-space-meta">--space-9 · 96px</div><div class="sg-space-bar" style="width:96px;height:20px;"></div></div>
     <div class="sg-space-row"><div class="sg-space-meta">--space-10 · 128px</div><div class="sg-space-bar" style="width:128px;height:20px;"></div></div>
+  </div>
+</section>
+
+<!-- VERTIKALER RHYTHMUS -->
+<section class="sg-section" id="vertical-rhythm">
+  <div class="sg-section__title">Prinzip <span>Überschriften, Content-Elemente</span></div>
+  <div class="sg-h">Vertikaler Rhythmus</div>
+  <p class="sg-intro">
+    Bis 2026-10 gab es dafür keine Regel — jede Komponente hat ihre Abstände einzeln erfunden,
+    und der globale Reset setzt <code>h1–h6 { margin: 0 }</code>. Ergebnis: Überschriften ohne
+    jeden Abstand zum nächsten Element, Content-Elemente, die aneinanderkleben. Entdeckt an der
+    <code>velo_park_test</code>-Komponente (Veloparkplätze-Testberichte), aber als generelles
+    Prinzip gelöst, nicht als Einzelfix.
+  </p>
+
+  <div class="sg-component">
+    <div class="sg-preview--white">
+      <h2 style="margin-top:0;">Eine Überschrift wie diese</h2>
+      <p style="max-width:520px;">…steht näher beim Text, den sie einleitet, als beim Element davor. Das ist Gestalts Prinzip der Nähe: was zusammengehört, bekommt weniger Abstand; was getrennte Gedanken sind, mehr.</p>
+    </div>
+    <p class="sg-note">Live-Vorschau — rendert mit den echten <code>.mod_article h2</code>-Regeln unten, kein Screenshot.</p>
+  </div>
+
+  <div class="sg-component">
+    <table class="sg-rhythm-table">
+      <thead><tr><th>Ebene</th><th>Abstand davor</th><th>Abstand danach</th></tr></thead>
+      <tbody>
+        <tr><td>h1, h2</td><td>--space-8 · 64px</td><td>--space-4 · 16px</td></tr>
+        <tr><td>h3, h4</td><td>--space-6 · 32px</td><td>--space-3 · 12px</td></tr>
+        <tr><td>h5, h6</td><td>--space-5 · 24px</td><td>--space-2 · 8px</td></tr>
+        <tr><td>Content-Element → Content-Element</td><td colspan="2">--space-6 · 32px (einheitlich, siehe unten)</td></tr>
+        <tr><td>Erstes Element im Fluss</td><td colspan="2">0 — kein Element davor, also kein Abstand davor</td></tr>
+      </tbody>
+    </table>
+    <p class="sg-note">
+      Abstand davor &gt; Abstand danach, bei jeder Ebene — nicht nur bei h1/h2. Alle Werte aus der
+      bestehenden <a href="#spacing" style="color:var(--color-primary);">--space-*-Skala</a>, keine
+      neuen Tokens nötig. Ausnahme: das erste Element im Fluss braucht keinen Abstand davor — es
+      sitzt bereits im eigenen Top-Padding des Containers, ein zusätzlicher Abstand davor wäre nur
+      ein unmotivierter Leerraum ohne etwas, wovon er trennt.
+    </p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-preview--white" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">/* Überschriften: Abstand davor &gt; Abstand danach, skaliert mit der Ebene.
+   :where() ist Absicht, nicht Dekoration: setzt die Spezifität dieser Regel auf
+   null, sodass JEDE andere Regel mit mindestens einer Klasse (.vw-heading h2,
+   .vw-hero__title, .modal-title, …) automatisch gewinnt -- unabhängig von der
+   Reihenfolge im Stylesheet. Ohne :where() ist ".mod_article h1" (eine Klasse +
+   ein Tag) spezifischer als Einzelklassen-Regeln wie ".vw-hero__title" und hat
+   sie beim ersten Rollout dieser Regel still überschrieben (Homepage-Regression,
+   erst beim Live-Test aufgefallen -- dieser Hinweis bleibt stehen als Warnung). */
+:where(.mod_article, .vw-prose-flow) h1,
+:where(.mod_article, .vw-prose-flow) h2 { margin-top: var(--space-8); margin-bottom: var(--space-4); }
+:where(.mod_article, .vw-prose-flow) h3,
+:where(.mod_article, .vw-prose-flow) h4 { margin-top: var(--space-6); margin-bottom: var(--space-3); }
+:where(.mod_article, .vw-prose-flow) h5,
+:where(.mod_article, .vw-prose-flow) h6 { margin-top: var(--space-5); margin-bottom: var(--space-2); }
+
+/* Erstes Element im Fluss: kein Abstand davor. :first-child prüft die Position
+   unter Geschwisterelementen im direkten Elternelement, nicht die Position im
+   Dokument -- erreicht eine Überschrift also unabhängig von ihrer Verschachtelungs-
+   tiefe, solange sie das erste Element in ihrem eigenen Container ist. Steht
+   bewusst ausserhalb von :where(): muss nur die eigene (spezifitätslose) Regel
+   oben schlagen, nicht fremde Komponenten-Regeln -- ein echter Spezifitätspunkt
+   reicht dafür. */
+:where(.mod_article, .vw-prose-flow) h1:first-child,
+:where(.mod_article, .vw-prose-flow) h2:first-child,
+:where(.mod_article, .vw-prose-flow) h3:first-child,
+:where(.mod_article, .vw-prose-flow) h4:first-child,
+:where(.mod_article, .vw-prose-flow) h5:first-child,
+:where(.mod_article, .vw-prose-flow) h6:first-child { margin-top: 0; }
+
+/* Content-Element zu Content-Element (z.B. zwei Bilder hintereinander): ein
+   "lobotomized owl"-Selektor, bewusst nur margin-top, damit sich Abstände nie
+   verdoppeln. content-velo-* ausgeschlossen: das sind eigenständige Sektionen
+   (Hero, Melde, Positions, Join, Newsletter, Tabs, Park-Test), die ihren Abstand
+   bereits selber über padding-block auf einem inneren .vw-section-Wrapper lösen
+   -- diese Regel sollte dort nie zusätzlich draufaddieren (tat es aber anfangs
+   doch, siehe Hinweis oben: gleiche Homepage-Regression, anderer Mechanismus). */
+.mod_article &gt; [class*="content-"]:not([class*="content-velo-"]) + [class*="content-"]:not([class*="content-velo-"]) { margin-top: var(--space-6); }</pre>
+    </div>
+    <p class="sg-note">
+      Umgesetzt in <code>files/themes/velo/css/colors_and_type.css</code> (Überschriften) und
+      <code>site.css</code> (Content-Element-Abstand) im Contao-Projekt. <code>.vw-prose-flow</code>
+      ist die Klasse für Kontexte ausserhalb eines <code>.mod_article</code> (z.B. innerhalb einer
+      Card-Komponente), die denselben Rhythmus wollen.
+    </p>
+  </div>
+
+  <div class="sg-component">
+    <p class="sg-note" style="font-style:normal;">
+      <strong>Herausforderung willkommen:</strong> diese Seite ist der Ort dafür, nicht der
+      Commit-Verlauf. Wenn die Werte in der Praxis falsch wirken — zu eng, zu weit, falsche
+      Ebene — hier ändern und den Grund dazuschreiben, bevor es wieder zum Einzelfix-Wildwuchs
+      wird, den diese Regel ersetzt hat.
+    </p>
   </div>
 </section>
 

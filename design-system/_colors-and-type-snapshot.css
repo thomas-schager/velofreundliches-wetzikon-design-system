@@ -1,15 +1,4 @@
 /*
- * SNAPSHOT — copied verbatim from VeloWetzikon_Contao's
- * files/themes/velo/css/colors_and_type.css on 2026-08-17, for the human-readable
- * implementation overview in this folder only. See _site-snapshot.css's header for the full
- * "why" -- same reasoning applies here.
- *
- * The :root block below duplicates ../tokens.css (expected -- kept for a faithful, complete
- * snapshot of the real file rather than a hand-trimmed excerpt). ../tokens.css is still the
- * canonical source; this file's :root is not consumed by anything, only its component rules
- * below :root (base reset, buttons, forms, cards, callouts, modal, rating scale, upload area,
- * captcha) are what this preview actually needs, since those live here rather than in site.css.
- *
  * Velofreundliches Wetzikon — Design Tokens & Typography
  * Palette B — Primary #dc3406
  * Load this file FIRST, then site.css
@@ -157,6 +146,45 @@ h4 { font-weight: 600; font-size: var(--text-xl);  line-height: var(--lh-snug); 
 h5 { font-weight: 600; font-size: var(--text-sm);  line-height: var(--lh-snug); letter-spacing: var(--tracking-tight); }
 h6 { font-weight: 500; font-size: var(--text-xs);  line-height: var(--lh-snug); color: var(--color-text-muted); }
 
+/* ------------------------------------------------------------
+   VERTICAL RHYTHM — headings in flowing content
+   Principle + full rationale documented in the design-tokens repo
+   (design-system/tokens.html#vertical-rhythm) -- summary: a heading should read as attached to
+   the content it introduces, not stranded between two unrelated things, so the gap ABOVE a
+   heading (separating it from whatever came before) is always larger than the gap BELOW it
+   (connecting it to what follows). Scales with heading level. Values are existing --space-*
+   tokens only, no new ones introduced.
+   :where() is deliberate, not decorative: it drops this rule's specificity to zero (just the
+   bare h1-h6 contributes), so ANY other selector with at least one class -- .vw-heading h2,
+   .vw-hero__title, .modal-title, a future component, whatever -- wins automatically regardless
+   of source order. Without it, ".mod_article h1" (one class + one tag) is *more* specific than
+   single-class component overrides like ".vw-hero__title", and silently overrode them -- found
+   when fixing homepage spacing regressions this rule caused by winning fights it was never
+   meant to be in. This should only ever fill in a default for headings with no bespoke styling.
+   ------------------------------------------------------------ */
+:where(.mod_article, .vw-prose-flow) h1,
+:where(.mod_article, .vw-prose-flow) h2 { margin-top: var(--space-8); margin-bottom: var(--space-4); }
+:where(.mod_article, .vw-prose-flow) h3,
+:where(.mod_article, .vw-prose-flow) h4 { margin-top: var(--space-6); margin-bottom: var(--space-3); }
+:where(.mod_article, .vw-prose-flow) h5,
+:where(.mod_article, .vw-prose-flow) h6 { margin-top: var(--space-5); margin-bottom: var(--space-2); }
+
+/* The "gap above" only makes sense when there's something above to separate from -- the first
+   element in a flow needs no leading space (it already sits in the container's own top
+   padding). :first-child checks position among siblings within the immediate parent, not
+   document position, so this reaches a heading however deep it's nested inside a template
+   (e.g. velo_park_test's <h2> as the first node in .vw-parktest__lead-block) as long as it's
+   the first thing in its own container -- which is how headings are actually authored in
+   practice. :first-child sits outside :where() on purpose: it only needs to beat this same
+   rule's own (zero-specificity) margin-top, not component-specific overrides elsewhere, so
+   giving it one real specificity point is enough and keeps it simple. */
+:where(.mod_article, .vw-prose-flow) h1:first-child,
+:where(.mod_article, .vw-prose-flow) h2:first-child,
+:where(.mod_article, .vw-prose-flow) h3:first-child,
+:where(.mod_article, .vw-prose-flow) h4:first-child,
+:where(.mod_article, .vw-prose-flow) h5:first-child,
+:where(.mod_article, .vw-prose-flow) h6:first-child { margin-top: 0; }
+
 a {
   color: var(--color-primary);
   text-decoration: underline;
@@ -188,13 +216,19 @@ nav a:hover { text-decoration: underline; text-underline-offset: 5px; }
 }
 .vw-eyebrow--accent { color: var(--color-accent); }
 
-/* Lead */
+/* Lead -- mobile-first: on narrow screens var(--text-xl) (22px) read noticeably larger than
+   the surrounding body/highlight text (18px), with 1.6 line-height on top making it wrap into
+   many short, heavy-looking lines right under the heading. Same breakpoint as .vw-section's own
+   mobile-first scaling below, just for font-size instead of spacing. */
 .vw-lead {
   font-family: var(--font-body);
   font-weight: 400;
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   line-height: var(--lh-relaxed);
   color: var(--color-text-muted);
+}
+@media (min-width: 600px) {
+  .vw-lead { font-size: var(--text-xl); }
 }
 
 /* Section heading block */
