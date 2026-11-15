@@ -233,8 +233,30 @@ nav a:hover { text-decoration: underline; text-underline-offset: 5px; }
 
 /* Section heading block */
 .vw-heading { margin-bottom: var(--space-7); }
-.vw-heading h2 { margin-top: var(--space-2); }
 .vw-heading .vw-lead { margin-top: var(--space-3); }
+
+/* An <h1> here (velo_lead) is a page title, not the one big homepage hero (.vw-hero__title,
+   styled separately and deliberately huge) -- every page should still carry exactly one real
+   <h1> for SEO/a11y, so give it a size appropriate for a normal page title instead of the bare
+   global h1 rule's clamp(--text-4xl, 5vw, --text-6xl), which made it unusable anywhere but the
+   hero. Deliberately its OWN tier, not a copy of the bare h2 rule below -- velo_steps/
+   velo_positions render a real <h2> right under this on the same page (their own section intro),
+   and an h1 that numerically matches h2's clamp erases the hierarchy between them (2026-11-08). */
+.vw-heading h1 {
+  font-size: clamp(var(--text-3xl), 3.5vw, var(--text-4xl));
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  margin-top: var(--space-2);
+}
+
+/* One tier below .vw-heading h1 above -- this is the section-intro heading used by
+   velo_positions/velo_steps, usually appearing on the same page as a velo_lead h1 a bit further
+   up, so it needs to read as clearly subordinate to it rather than matching the bare global h2
+   rule (meant for flowing article content, not a heading that sits this close to a page h1). */
+.vw-heading h2 {
+  font-size: clamp(var(--text-2xl), 2.5vw, var(--text-3xl));
+  margin-top: var(--space-2);
+}
 
 /* Container */
 .vw-container {

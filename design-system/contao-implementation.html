@@ -160,6 +160,24 @@ body {
     <div class="sg-preview--white"><h2>Bleib auf dem Laufenden.</h2></div>
   </div>
   <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-heading h1</span><span class="sg-badge sg-badge--label">Jost 600 · clamp(36px → 48px) · lh-tight</span></div>
+    <div class="sg-preview--white"><div class="vw-heading" style="margin-bottom:0;"><h1>Unterstütze Velofreundliches Wetzikon</h1></div></div>
+    <p class="sg-note">Scoped override für <code>velo_lead</code> (<code>.vw-heading h1</code>) — jede Seite
+    braucht aus SEO-/A11y-Gründen ein echtes <code>&lt;h1&gt;</code>, aber das globale h1 oben
+    (clamp 48px → 80px) ist für einen normalen Seitentitel masslos zu gross und macht nur beim
+    Homepage-Hero (<code>.vw-hero__title</code>, eigene Regel) Sinn. Eigene, kleinere Stufe statt
+    diese globale Regel weiterzuverwenden.</p>
+  </div>
+  <div class="sg-component">
+    <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-heading h2</span><span class="sg-badge sg-badge--label">clamp(28px → 36px) · lh-tight</span></div>
+    <div class="sg-preview--white"><div class="vw-heading" style="margin-bottom:0;"><h2>Von deinem Input zur echten Verbesserung</h2></div></div>
+    <p class="sg-note">Scoped override für die Abschnitts-Überschrift in <code>velo_positions</code>/
+    <code>velo_steps</code> — nicht einfach das globale h2 oben: die Seite trägt direkt darüber
+    meist schon ein <code>.vw-heading h1</code> (velo_lead), und solange dieses h2 numerisch mit
+    jenem h1 übereinstimmt, verschwindet die Hierarchie zwischen Seitentitel und Abschnitt
+    komplett. Deshalb eine eigene, kleinere Stufe für dieses h2.</p>
+  </div>
+  <div class="sg-component">
     <div class="sg-component__labels"><span class="sg-badge sg-badge--css">h3</span><span class="sg-badge sg-badge--label">Jost 600 · 28px · lh-snug</span></div>
     <div class="sg-preview--white"><h3>Gefährliche Stelle entdeckt?</h3></div>
   </div>
@@ -186,9 +204,9 @@ body {
   <div class="sg-component">
     <div class="sg-component__labels"><span class="sg-badge sg-badge--css">.vw-lead</span><span class="sg-badge sg-badge--label">Roboto 400 · 18px → 22px ab 600px · lh-relaxed · color-text-muted</span></div>
     <div class="sg-preview--white"><p class="vw-lead">Wir setzen uns für sichere Velowege, gut ausgeschilderte Routen und ausreichend Abstellplätze ein.</p></div>
-    <p class="sg-note">Mobile-first (2026-10): die feste 22px wirkte auf schmalen Screens deutlich grösser
-    als der umliegende 18px-Fliesstext und nahm unverhältnismässig viel vertikalen Platz ein.
-    Jetzt 18px bis 600px, danach 22px — gleiches Breakpoint-Muster wie <code>.vw-section</code>.</p>
+    <p class="sg-note">Mobile-first: 18px bis 600px, danach 22px — eine feste 22px würde auf schmalen
+    Screens deutlich grösser als der umliegende 18px-Fliesstext wirken und unverhältnismässig viel
+    vertikalen Platz einnehmen. Gleiches Breakpoint-Muster wie <code>.vw-section</code>.</p>
   </div>
 </section>
 
@@ -561,7 +579,7 @@ body {
     Detail-Karte). Grid: 1.3fr Haupt­spalte / 1fr Karte ab 960px, Karte zuerst auf Mobile
     direkt nach Lead. Vertikaler Rhythmus: siehe <a href="tokens.html#vertical-rhythm" style="color:var(--color-primary);">tokens.html#vertical-rhythm</a>.
     <br><br>
-    <strong>Kriterien in zwei Gruppen (2026-10):</strong> die sechs Kriterien sind inhaltlich in
+    <strong>Kriterien in zwei Gruppen:</strong> die sechs Kriterien sind inhaltlich in
     "Lage &amp; Erreichbarkeit" (Anfahrt, Wege zu Eingang/Einkaufswagen) und "Vor Ort" (Platz,
     Auslastung, Wetterschutz) unterteilt — ein Gruppen-Label pro Dreiergruppe, gleicher visueller
     Stil wie das bestehende "NOTE"-Label (uppercase, gedämpft, <code>tracking-wide</code>), keine
@@ -597,13 +615,13 @@ body {
         <span>Mit dem Einkaufswagen kommt man direkt zum Velo</span>
       </li>
     </ul>
-    <p class="sg-note">Stacking-Context-Falle (2026-10): die Leaflet-Karte und ihr
-    Street/Satellit-Toggle hatten beide <code>position:relative</code> ohne eigenen
-    <code>z-index</code> — dadurch keine echte Stacking-Context-Grenze, und Leaflets interne
-    Ebenen (bis <code>z-index:700</code> fürs Popup) bzw. der Toggle (<code>z-index:1000</code>)
-    konkurrierten direkt mit dem Sticky-Header (<code>z-index:100</code>) beim Scrollen, statt
-    in der Karte eingeschlossen zu bleiben. Fix: <code>z-index:0</code> auf
-    <code>.vw-parktest__map</code> und <code>.vw-parktest__map-wrap</code> ergänzt.</p>
+    <p class="sg-note">Stacking-Context: <code>.vw-parktest__map</code> und
+    <code>.vw-parktest__map-wrap</code> tragen <code>position:relative</code> zusammen mit
+    <code>z-index:0</code>, damit sie einen eigenen Stacking-Context bilden. Ohne diesen
+    <code>z-index</code> gäbe es keine echte Stacking-Context-Grenze, und Leaflets interne Ebenen
+    (bis <code>z-index:700</code> fürs Popup) bzw. der Street/Satellit-Toggle
+    (<code>z-index:1000</code>) würden beim Scrollen direkt mit dem Sticky-Header
+    (<code>z-index:100</code>) konkurrieren statt in der Karte eingeschlossen zu bleiben.</p>
   </div>
 </section>
 
@@ -655,19 +673,16 @@ body {
     (RTE, 2-3 Absätze oder eine Liste) · <code>velo_fp_image/alt</code>. Für ein Foto mit eigenem
     Kommentar (nicht für eine reine Foto-Sammlung ohne Einzel-Captions — dafür velo_gallery).
     <br><br>
-    <strong>Design-Historie (zwei Runden, je mit Vergleichsdateien ausserhalb dieses Repos
-    diskutiert):</strong> Runde 1 war eine <code>.vw-card</code>-Umsetzung (Rahmen, Schatten,
-    rechtsbündig, 65% Breite, Foto/Text 50/50) — verworfen, weil sie wie ein klickbares Element
-    aussah, aber keinen Link hatte und das Foto selbst nicht anklickbar war. Fünf Alternativen
-    wurden verglichen; gewählt wurde <strong>"Figure &amp; Caption"</strong> — kein Rahmen, kein
-    Hintergrund am Foto selbst, grosses Bild mit schlichter Caption darunter (dokumentarischer
-    Stil, keinerlei Interaktions-Erwartung).
+    <strong>Darstellung:</strong> "Figure &amp; Caption" — kein Rahmen, kein Hintergrund am Foto
+    selbst, grosses Bild mit schlichter Caption darunter (dokumentarischer Stil, keinerlei
+    Interaktions-Erwartung durch Rahmen/Schatten, die ein klickbares Kartenelement vortäuschen
+    würden).
     <br><br>
-    Runde 2 klärte die <strong>Platzierung</strong>: nicht einzeln verstreut im Fliesstext,
-    sondern mehrere direkt hintereinander wie eine Galerie, aber jede Kachel mit eigener
-    Caption. Bewusst <strong>ohne Wrapper-Element</strong> — Redaktor:innen platzieren einfach
-    mehrere <code>velo_feature_photo</code> hintereinander, kein zusätzliches "Container"-Element
-    nötig. Technisch gelöst über <code>float</code> + <code>:nth-child(odd/even of
+    <strong>Platzierung:</strong> nicht einzeln verstreut im Fliesstext, sondern mehrere direkt
+    hintereinander wie eine Galerie, aber jede Kachel mit eigener Caption. Bewusst <strong>ohne
+    Wrapper-Element</strong> — Redaktor:innen platzieren einfach mehrere
+    <code>velo_feature_photo</code> hintereinander, kein zusätzliches "Container"-Element nötig.
+    Technisch gelöst über <code>float</code> + <code>:nth-child(odd/even of
     .content-velo-feature-photo)</code> (CSS Selectors L4 — zählt Position nur unter
     gleichartigen Geschwistern, robust auch falls andere Elemente dazwischenstehen): bildet ab
     640px automatisch ein 2-spaltiges Grid, jede Kachel mit <code>--color-surface-2</code>-Hintergrund,
@@ -675,16 +690,16 @@ body {
     Elemente. Eine einzelne Kachel (kein Nachbar vom selben Typ) bleibt volle Breite statt
     halb mit Leerraum daneben.
     <br><br>
-    Runde 3 (2026-10) machte das Foto selbst <strong>anklickbar</strong>: öffnet, wie bei
+    Das Foto selbst ist <strong>anklickbar</strong>: öffnet, wie bei
     <a href="#el-gallery" style="color:var(--color-primary);">velo_gallery</a>, im selben
     nativen <code>&lt;dialog&gt;</code>-Lightbox-Grundmuster (<code>.vw-lightbox</code>,
     <code>showModal()</code>), nur ohne Vor/Zurück, da immer nur ein Foto. Caption wird beim
     Öffnen mitgezeigt. Die Lightbox selbst ist eine <strong>verbundene Form</strong> statt zweier
     getrennter Blöcke: Foto bildet randabschneidend den oberen Teil des Rahmens
     (<code>.vw-lightbox__figure</code> trägt Hintergrund/Radius/Schatten selbst, nicht das Foto),
-    Caption direkt darunter mit eigener Polsterung — gewählt nach einem Vergleich von invertierten
-    (dunkel) vs. Original-Farben (hell) sowie zwei "verbunden"-Varianten (randabschneidend vs.
-    eingerückt wie die statische Caption); hell + randabschneidend gewann. Bild wird
+    Caption direkt darunter mit eigener Polsterung, randabschneidend statt eingerückt, in den
+    Original-Farben statt invertiert (dunkel) — damit die Lightbox wie eine vergrösserte Version
+    der statischen Kachel wirkt statt wie ein eigenständiges, abweichendes Element. Bild wird
     <strong>nie beschnitten</strong> — <code>width/height:auto</code>, nur durch
     <code>max-width/max-height</code> begrenzt, Rahmen und Dialog passen sich der tatsächlichen
     Bildhöhe an statt umgekehrt.

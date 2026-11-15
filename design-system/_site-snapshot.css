@@ -663,6 +663,97 @@
 .vw-newsletter__form .widget-submit button:hover { background: var(--color-primary-dark, #c0392b); }
 
 /* ============================================================
+   NEWSLETTER SIGNUP — COMPACT (velo_newsletter_compact)
+   Lighter/shorter alternative to .vw-newsletter above: a quiet inline banner (icon · text ·
+   form in one row) instead of a full-bleed dark section. margin-top:var(--space-9) matches
+   .vw-newsletter's own spacing exactly -- same role in the page, same gap from what precedes
+   it. Unlike .vw-newsletter, this one should NOT go edge-to-edge -- it's meant to sit quietly
+   within the normal content width, same as the heading/lead text and the feature-photos above
+   it, not bleed past the gutter like the dark attention-grabbing section does. The generic
+   [class*="content-velo-"] rule breaks every custom velo element out to full width by default
+   (right choice for most of them); content-velo-feature-photo already opts back out of that
+   with its own margin-inline:0 -- this needs the same override, which was missing (made the
+   compact banner visibly wider than everything else on the page). */
+.content-velo-newsletter-compact { margin-inline: 0; }
+.vw-newsletter-compact {
+  background: var(--color-surface-2);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-9);
+  padding: var(--space-5);
+}
+.vw-newsletter-compact__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+.vw-newsletter-compact__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+.vw-newsletter-compact__text { flex: 1 1 200px; min-width: 0; }
+.vw-newsletter-compact__text h2 { margin: 0; font: 600 var(--text-lg) var(--font-display); letter-spacing: var(--tracking-tight); }
+.vw-newsletter-compact__text p { margin: 2px 0 0; color: var(--color-text-muted); font-size: var(--text-sm); }
+.vw-newsletter-compact__form { flex: 1 1 260px; min-width: 0; }
+
+/* Real Contao form markup (same .formbody/.widget-* structure as .vw-newsletter__form above),
+   just recolored for this light surface instead of the dark one. */
+.vw-newsletter-compact__form .formbody {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: flex-end;
+  min-width: 0;
+}
+.vw-newsletter-compact__form .widget { margin: 0; }
+.vw-newsletter-compact__form .widget-text { flex: 1 1 180px; min-width: 0; }
+.vw-newsletter-compact__form .widget-text label {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+.vw-newsletter-compact__form .widget-text input[type="email"],
+.vw-newsletter-compact__form .widget-text input[type="text"] {
+  width: 100%;
+  height: 44px;
+  padding: 0 var(--space-4);
+  border: 1.5px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: 400 var(--text-base) var(--font-body);
+  transition: border-color var(--dur) var(--ease);
+}
+.vw-newsletter-compact__form .widget-text input::placeholder { color: var(--color-muted); }
+.vw-newsletter-compact__form .widget-text input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+.vw-newsletter-compact__form .widget-submit button {
+  height: 44px;
+  padding: 0 var(--space-5);
+  background: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-md);
+  font: 600 var(--text-base) var(--font-display);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease);
+}
+.vw-newsletter-compact__form .widget-submit button:hover { background: var(--color-primary-hover); }
+
+/* ============================================================
    FOOTER
    ============================================================ */
 
@@ -989,8 +1080,16 @@
 .vw-parktest__lead-block { grid-area: lead; min-width: 0; }
 .vw-parktest__highlights-block { grid-area: highlights; min-width: 0; }
 .vw-parktest__explanation-block { grid-area: explanation; min-width: 0; }
-/* h2 margin-bottom now comes from the global vertical-rhythm rule (colors_and_type.css,
-   .mod_article h2), no separate override needed here. */
+/* margin-top/bottom come from the global vertical-rhythm rule (colors_and_type.css,
+   :where(.mod_article, .vw-prose-flow) h1, h2 { ... }) -- that rule already treats h1 and h2
+   identically, so no separate override needed here even though the tag changed. */
+/* This heading is semantically the page's H1 now (see the template comment for why), but must
+   keep the exact visual size it always had as a bare h2 -- the global h1 rule is bigger/bolder
+   (clamp(text-4xl,5vw,text-6xl), weight 700) than what this has shown since launch
+   (clamp(text-3xl,3.5vw,text-4xl), weight 600). Reuses the design system's own H2 scale
+   rather than inventing a new size, so the tag became more semantically correct without any
+   visible change. */
+.vw-parktest__title { font-weight: 600; font-size: clamp(var(--text-3xl), 3.5vw, var(--text-4xl)); }
 /* Two-class selectors, not bare .vw-parktest__lead/.vw-highlight-list -- each is the last (or
    only) child of its grid-item wrapper, so the global `p:last-child { margin-bottom: 0 }`
    reset (colors_and_type.css) would otherwise win the lead paragraph's margin on specificity.
@@ -1017,7 +1116,11 @@
   .vw-parktest__card { padding: 28px 32px; }
 }
 @media (min-width: 960px) {
-  .vw-parktest__card { position: sticky; top: var(--space-6); }
+  /* top:var(--space-6) alone (32px) didn't account for the sticky nav's own height
+     (--nav-h:72px at this breakpoint, z-index:100) -- the card's sticky stop-position landed
+     well within the nav's opaque band, so it scrolled up underneath it instead of stopping
+     just below. Same fix as .vw-form-aside uses for the identical problem. */
+  .vw-parktest__card { position: sticky; top: calc(var(--nav-h) + var(--space-5)); }
 }
 
 .vw-parktest__note { text-align: center; margin-bottom: var(--space-5); }
@@ -1030,6 +1133,49 @@
   margin-bottom: var(--space-1);
 }
 .vw-parktest__note-value { font: 700 var(--text-4xl) var(--font-display); line-height: var(--lh-tight); }
+
+/* Info trigger ("(i) Berechnung") as a third centered line under the note value, opening a
+   popover bubble -- see the /tmp comparison file's "Variante 5" for the full writeup. The
+   trigger carries anchor-name so the bubble (an actual top-layer popover, not absolutely
+   positioned in normal flow) can anchor itself directly below it via CSS anchor positioning;
+   browsers without anchor-positioning support just fall back to the popover's own default
+   (centered in the viewport) -- degraded but still functional, never broken. */
+.vw-parktest__note-trigger-wrap { margin-top: var(--space-2); }
+.vw-parktest__note-trigger {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  color: var(--color-muted);
+  font: 500 var(--text-xs) var(--font-body);
+  anchor-name: --vw-pt-note-anchor;
+}
+.vw-parktest__note-trigger svg { width: 14px; height: 14px; margin-right: 4px; }
+.vw-parktest__note-trigger:hover,
+.vw-parktest__note-trigger:focus-visible { color: var(--color-primary); }
+[popover].vw-parktest__note-bubble {
+  position-anchor: --vw-pt-note-anchor;
+  position: absolute;
+  top: anchor(bottom);
+  justify-self: anchor-center;
+  margin: 0;
+  margin-top: 8px;
+  width: 260px;
+  max-width: 90vw;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background: var(--color-surface);
+  font: 400 var(--text-xs) var(--font-body);
+  line-height: var(--lh-relaxed);
+  color: var(--color-text-muted);
+  text-align: left;
+  text-transform: none;
+  letter-spacing: normal;
+}
 
 /* Group label, same visual treatment as .vw-parktest__note-label above it (uppercase, tracked,
    muted) so it reads as part of the same card's design language. No extra margin/gap rule is
@@ -1066,7 +1212,9 @@
 .vw-parktest__map-wrap { position: relative; z-index: 0; }
 .vw-parktest__map {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  /* 40% shorter than the previous 4/3 (height = 0.75 * width): 0.75 * 0.6 = 0.45 * width,
+     i.e. width/height = 1/0.45 = 20/9. */
+  aspect-ratio: 20 / 9;
   border-radius: var(--radius-sm);
   border: 1px solid var(--color-border);
   overflow: hidden;
@@ -1101,7 +1249,14 @@
 .vw-parktest__map-toggle-btn + .vw-parktest__map-toggle-btn { border-left: 1px solid var(--color-border); }
 .vw-parktest__map-toggle-btn.active { background: #3a3a3a; color: #fff; }
 .vw-parktest__map-toggle-btn:hover:not(.active) { background: var(--color-surface-2); color: var(--color-text); }
-.vw-parktest__address { margin-top: var(--space-2); font: 400 var(--text-xs) var(--font-body); color: var(--color-text-muted); text-align: center; }
+/* Two-class selector, not bare .vw-parktest__address -- this <p> sits inside .vw-card
+   (the card's own vw-card--campaign/vw-parktest__card wrapper), and .vw-card p's own
+   font-size:var(--text-base) rule (one class + one tag, specificity 0,1,1) otherwise beats this
+   rule's intended font-size (0,1,0) regardless of source order, silently rendering the address
+   at normal body-text size (16px) instead of the small muted caption (--text-xs, 12px) every
+   other caption in this file achieves -- same fix pattern already used for
+   .vw-parktest__lead-block .vw-parktest__lead above. */
+.vw-parktest__card .vw-parktest__address { margin-top: var(--space-2); font: 400 var(--text-xs) var(--font-body); color: var(--color-text-muted); text-align: center; }
 .vw-parktest-pin { width: 24px; height: 32px; }
 .vw-parktest-pin svg { width: 100%; height: 100%; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.22)); }
 

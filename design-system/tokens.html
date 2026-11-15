@@ -104,6 +104,41 @@ pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflo
 .sg-rhythm-table th, .sg-rhythm-table td { text-align: left; padding: 8px 14px 8px 0; border-bottom: 1px solid var(--color-border); }
 .sg-rhythm-table th { font-weight: 600; color: var(--color-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em; }
 .sg-rhythm-table td:first-child { font-family: monospace; }
+
+/* Spacing diagrams -- vertical "stack" schematics. Gap bars are rendered at their real pixel
+   height (scaled down together for the largest cases via --sg-diagram-scale), so a 64px gap
+   visibly reads as 4x a 16px gap, not just as two numbers in a table. */
+.sg-diagram-row { display: flex; gap: 40px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 20px; }
+.sg-stack { display: flex; flex-direction: column; width: 280px; }
+.sg-stack-box {
+  background: #fff; border: 1px solid var(--color-border); border-radius: 6px;
+  padding: 12px 16px; font: 400 13px var(--font-body); color: var(--color-text-muted);
+}
+.sg-stack-box--heading { border-color: var(--color-primary); color: #000; font: 700 15px var(--font-display); }
+.sg-stack-gap { display: flex; align-items: stretch; gap: 10px; }
+.sg-stack-gap-bar { width: 5px; border-radius: 3px; background: var(--color-primary); opacity: 0.45; flex-shrink: 0; }
+.sg-stack-gap-bar--wrong { background: var(--color-danger); opacity: 0.6; }
+.sg-stack-gap-bar--right { background: var(--color-success); opacity: 0.55; }
+.sg-stack-gap-label { align-self: center; font: 500 11px/1.3 monospace; color: var(--color-muted); white-space: nowrap; }
+
+.sg-compare { display: flex; gap: 40px; flex-wrap: wrap; }
+.sg-compare__col { width: 240px; }
+.sg-compare__tag {
+  display: inline-block; font: 700 11px var(--font-body); text-transform: uppercase;
+  letter-spacing: 0.04em; padding: 3px 9px; border-radius: 4px; margin-bottom: 14px;
+}
+.sg-compare__tag--wrong { background: var(--color-danger); color: #fff; }
+.sg-compare__tag--right { background: var(--color-success); color: #fff; }
+.sg-compare__sum { font: 500 12px monospace; color: var(--color-muted); margin-top: 10px; }
+.sg-compare__sum--wrong { color: var(--color-danger); }
+.sg-compare__sum--right { color: var(--color-success-dark); }
+
+/* .vw-main stand-in used in both diagrams below -- not a content-element box, so visually
+   distinct (tinted, dashed) from the .sg-stack-box component boxes it contains. */
+.sg-stack-box--main {
+  background: var(--color-surface-2); border: 1px dashed var(--color-border-strong);
+  color: var(--color-muted); font: 500 11px monospace; text-align: center; padding: 6px;
+}
 </style>
 </head>
 <body>
@@ -121,6 +156,7 @@ pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflo
       <a href="#typography-tokens">Typografie</a>
       <a href="#spacing">Abstände</a>
       <a href="#vertical-rhythm">Vertikaler Rhythmus</a>
+      <a href="#first-element-spacing">Erstes Element der Seite</a>
       <a href="#radii">Radien</a>
       <a href="#shadows">Schatten</a>
       <a href="#layout-tokens">Layout, Breakpoints, Motion</a>
@@ -264,19 +300,49 @@ pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflo
   <div class="sg-section__title">Prinzip <span>Überschriften, Content-Elemente</span></div>
   <div class="sg-h">Vertikaler Rhythmus</div>
   <p class="sg-intro">
-    Bis 2026-10 gab es dafür keine Regel — jede Komponente hat ihre Abstände einzeln erfunden,
-    und der globale Reset setzt <code>h1–h6 { margin: 0 }</code>. Ergebnis: Überschriften ohne
-    jeden Abstand zum nächsten Element, Content-Elemente, die aneinanderkleben. Entdeckt an der
-    <code>velo_park_test</code>-Komponente (Veloparkplätze-Testberichte), aber als generelles
-    Prinzip gelöst, nicht als Einzelfix.
+    Jede Überschrift steht näher bei dem Text, den sie einleitet, als beim Element davor — das
+    Gestaltgesetz der Nähe: was inhaltlich zusammengehört, bekommt weniger Abstand; was zwei
+    getrennte Gedanken sind, mehr. Gilt für jede Überschriftenebene und für die Abfolge ganzer
+    Content-Elemente, nicht nur für h1/h2.
   </p>
 
   <div class="sg-component">
     <div class="sg-preview--white">
       <h2 style="margin-top:0;">Eine Überschrift wie diese</h2>
-      <p style="max-width:520px;">…steht näher beim Text, den sie einleitet, als beim Element davor. Das ist Gestalts Prinzip der Nähe: was zusammengehört, bekommt weniger Abstand; was getrennte Gedanken sind, mehr.</p>
+      <p style="max-width:520px;">…steht näher beim Text, den sie einleitet, als beim Element davor.</p>
     </div>
-    <p class="sg-note">Live-Vorschau — rendert mit den echten <code>.mod_article h2</code>-Regeln unten, kein Screenshot.</p>
+    <p class="sg-note">Live-Vorschau — rendert mit den echten <code>.mod_article h2</code>-Regeln weiter unten, kein Screenshot.</p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-diagram-row">
+      <div>
+        <div class="sg-stack">
+          <div class="sg-stack-box">Text davor</div>
+          <div class="sg-stack-gap" style="height:64px">
+            <div class="sg-stack-gap-bar"></div>
+            <span class="sg-stack-gap-label">64px</span>
+          </div>
+          <div class="sg-stack-box sg-stack-box--heading">Überschrift (h1/h2)</div>
+          <div class="sg-stack-gap" style="height:16px">
+            <div class="sg-stack-gap-bar"></div>
+            <span class="sg-stack-gap-label">16px</span>
+          </div>
+          <div class="sg-stack-box">Zugehöriger Text</div>
+        </div>
+      </div>
+      <div>
+        <div class="sg-stack">
+          <div class="sg-stack-box">Content-Element A</div>
+          <div class="sg-stack-gap" style="height:32px">
+            <div class="sg-stack-gap-bar"></div>
+            <span class="sg-stack-gap-label">32px</span>
+          </div>
+          <div class="sg-stack-box">Content-Element B</div>
+        </div>
+        <p class="sg-note" style="max-width:280px;">Einheitlicher Abstand zwischen zwei beliebigen Content-Elementen ohne eigenes Spacing — unabhängig von der Reihenfolge (z.B. Text → Bild oder Bild → Text).</p>
+      </div>
+    </div>
   </div>
 
   <div class="sg-component">
@@ -286,29 +352,26 @@ pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflo
         <tr><td>h1, h2</td><td>--space-8 · 64px</td><td>--space-4 · 16px</td></tr>
         <tr><td>h3, h4</td><td>--space-6 · 32px</td><td>--space-3 · 12px</td></tr>
         <tr><td>h5, h6</td><td>--space-5 · 24px</td><td>--space-2 · 8px</td></tr>
-        <tr><td>Content-Element → Content-Element</td><td colspan="2">--space-6 · 32px (einheitlich, siehe unten)</td></tr>
+        <tr><td>Content-Element → Content-Element</td><td colspan="2">--space-6 · 32px (einheitlich)</td></tr>
         <tr><td>Erstes Element im Fluss</td><td colspan="2">0 — kein Element davor, also kein Abstand davor</td></tr>
       </tbody>
     </table>
     <p class="sg-note">
-      Abstand davor &gt; Abstand danach, bei jeder Ebene — nicht nur bei h1/h2. Alle Werte aus der
-      bestehenden <a href="#spacing" style="color:var(--color-primary);">--space-*-Skala</a>, keine
-      neuen Tokens nötig. Ausnahme: das erste Element im Fluss braucht keinen Abstand davor — es
-      sitzt bereits im eigenen Top-Padding des Containers, ein zusätzlicher Abstand davor wäre nur
-      ein unmotivierter Leerraum ohne etwas, wovon er trennt.
+      Abstand davor &gt; Abstand danach, bei jeder Ebene. Alle Werte aus der bestehenden
+      <a href="#spacing" style="color:var(--color-primary);">--space-*-Skala</a>, keine neuen
+      Tokens nötig. Ausnahme: das erste Element im Fluss braucht keinen Abstand davor — es sitzt
+      bereits im eigenen Top-Padding des Containers (siehe <a href="#first-element-spacing" style="color:var(--color-primary);">Erstes Element der Seite</a>
+      weiter unten), ein zusätzlicher Abstand davor wäre nur ein unmotivierter Leerraum ohne
+      etwas, wovon er trennt.
     </p>
   </div>
 
   <div class="sg-component">
     <div class="sg-preview--white" style="padding:18px 22px;overflow-x:auto;">
       <pre class="sg-code">/* Überschriften: Abstand davor &gt; Abstand danach, skaliert mit der Ebene.
-   :where() ist Absicht, nicht Dekoration: setzt die Spezifität dieser Regel auf
-   null, sodass JEDE andere Regel mit mindestens einer Klasse (.vw-heading h2,
-   .vw-hero__title, .modal-title, …) automatisch gewinnt -- unabhängig von der
-   Reihenfolge im Stylesheet. Ohne :where() ist ".mod_article h1" (eine Klasse +
-   ein Tag) spezifischer als Einzelklassen-Regeln wie ".vw-hero__title" und hat
-   sie beim ersten Rollout dieser Regel still überschrieben (Homepage-Regression,
-   erst beim Live-Test aufgefallen -- dieser Hinweis bleibt stehen als Warnung). */
+   :where() setzt die Spezifität dieser Regel auf null, sodass JEDE andere Regel
+   mit mindestens einer Klasse (.vw-heading h2, .vw-hero__title, .modal-title, …)
+   automatisch gewinnt -- unabhängig von der Reihenfolge im Stylesheet. */
 :where(.mod_article, .vw-prose-flow) h1,
 :where(.mod_article, .vw-prose-flow) h2 { margin-top: var(--space-8); margin-bottom: var(--space-4); }
 :where(.mod_article, .vw-prose-flow) h3,
@@ -316,28 +379,47 @@ pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflo
 :where(.mod_article, .vw-prose-flow) h5,
 :where(.mod_article, .vw-prose-flow) h6 { margin-top: var(--space-5); margin-bottom: var(--space-2); }
 
-/* Erstes Element im Fluss: kein Abstand davor. :first-child prüft die Position
-   unter Geschwisterelementen im direkten Elternelement, nicht die Position im
-   Dokument -- erreicht eine Überschrift also unabhängig von ihrer Verschachtelungs-
-   tiefe, solange sie das erste Element in ihrem eigenen Container ist. Steht
-   bewusst ausserhalb von :where(): muss nur die eigene (spezifitätslose) Regel
-   oben schlagen, nicht fremde Komponenten-Regeln -- ein echter Spezifitätspunkt
-   reicht dafür. */
-:where(.mod_article, .vw-prose-flow) h1:first-child,
-:where(.mod_article, .vw-prose-flow) h2:first-child,
-:where(.mod_article, .vw-prose-flow) h3:first-child,
-:where(.mod_article, .vw-prose-flow) h4:first-child,
-:where(.mod_article, .vw-prose-flow) h5:first-child,
-:where(.mod_article, .vw-prose-flow) h6:first-child { margin-top: 0; }
+/* "Erstes Element im Fluss: kein Abstand davor" -- dafür reicht :first-child
+   NICHT allein: es prüft nur die Position unter Geschwisterelementen im
+   DIREKTEN Elternelement, nicht die Position im Dokument. In Contao bekommt
+   jedes Content-Element seinen eigenen Wrapper-<div> -- eine Überschrift ist
+   also "erstes Kind ihres eigenen Wrappers" unabhängig davon, ob VOR diesem
+   Wrapper schon etwas auf der Seite steht. Darum zusätzlich verlangen, dass
+   auch der WRAPPER selbst erstes Kind von .mod_article ist -- nur dann ist die
+   Überschrift wirklich die erste Sache auf der ganzen Seite. .vw-prose-flow hat
+   keinen solchen Wrapper pro Element (ein durchgehender Fliesstext, keine
+   Abfolge einzelner Contao-Elemente), darum reicht dort die einfache Prüfung. */
+:where(.mod_article > [class*="content-"]:first-child) h1:first-child,
+:where(.mod_article > [class*="content-"]:first-child) h2:first-child,
+:where(.mod_article > [class*="content-"]:first-child) h3:first-child,
+:where(.mod_article > [class*="content-"]:first-child) h4:first-child,
+:where(.mod_article > [class*="content-"]:first-child) h5:first-child,
+:where(.mod_article > [class*="content-"]:first-child) h6:first-child,
+:where(.vw-prose-flow) h1:first-child,
+:where(.vw-prose-flow) h2:first-child,
+:where(.vw-prose-flow) h3:first-child,
+:where(.vw-prose-flow) h4:first-child,
+:where(.vw-prose-flow) h5:first-child,
+:where(.vw-prose-flow) h6:first-child { margin-top: 0; }
 
-/* Content-Element zu Content-Element (z.B. zwei Bilder hintereinander): ein
-   "lobotomized owl"-Selektor, bewusst nur margin-top, damit sich Abstände nie
-   verdoppeln. content-velo-* ausgeschlossen: das sind eigenständige Sektionen
-   (Hero, Melde, Positions, Join, Newsletter, Tabs, Park-Test), die ihren Abstand
-   bereits selber über padding-block auf einem inneren .vw-section-Wrapper lösen
-   -- diese Regel sollte dort nie zusätzlich draufaddieren (tat es aber anfangs
-   doch, siehe Hinweis oben: gleiche Homepage-Regression, anderer Mechanismus). */
-.mod_article &gt; [class*="content-"]:not([class*="content-velo-"]) + [class*="content-"]:not([class*="content-velo-"]) { margin-top: var(--space-6); }</pre>
+/* Content-Element zu Content-Element (z.B. zwei Bilder hintereinander, oder ein
+   natives Text-Element nach einem velo_*-Element): ein "lobotomized owl"-
+   Selektor, bewusst nur margin-top, damit sich Abstände nie verdoppeln.
+   content-velo-* nur auf der EMPFANGENDEN Seite (nach dem +) ausgeschlossen --
+   das sind eigenständige Sektionen (Hero, Melde, Positions, Join, Newsletter,
+   Tabs, Park-Test), die ihren Abstand bereits selber lösen, diese Regel darf
+   dort nie zusätzlich draufaddieren. Auf der VORANGEHENDEN Seite gilt der
+   Ausschluss bewusst NICHT: ein natives Element braucht seinen eigenen Abstand
+   unabhängig davon, was davor steht, genau wie jedes velo_*-Element seinen
+   schon unabhängig vom Vorgänger mitbringt.
+   :is(...) statt nur [class*="content-"]: ein Content-Element vom Contao-Typ
+   "Modul" (ein eingebundenes Frontend-Modul, z.B. eine News-Liste) bekommt GAR
+   KEINEN content-<typ>-Wrapper -- Contao gibt direkt die Modul-Klasse aus (z.B.
+   <div class="mod_newslist block">), darum greift [class*="content-"] dort nie.
+   mod_*-Elemente sind nie gleichzeitig content-velo-*, der Ausschluss auf der
+   Empfänger-Seite muss das also nicht extra abdecken. */
+.mod_article &gt; :is([class*="content-"], [class^="mod_"])
+  + :is([class*="content-"], [class^="mod_"]):not([class*="content-velo-"]) { margin-top: var(--space-6); }</pre>
     </div>
     <p class="sg-note">
       Umgesetzt in <code>files/themes/velo/css/colors_and_type.css</code> (Überschriften) und
@@ -349,10 +431,125 @@ pre.sg-code { margin: 0; font: 400 12px/1.7 monospace; white-space: pre; overflo
 
   <div class="sg-component">
     <p class="sg-note" style="font-style:normal;">
-      <strong>Herausforderung willkommen:</strong> diese Seite ist der Ort dafür, nicht der
-      Commit-Verlauf. Wenn die Werte in der Praxis falsch wirken — zu eng, zu weit, falsche
-      Ebene — hier ändern und den Grund dazuschreiben, bevor es wieder zum Einzelfix-Wildwuchs
-      wird, den diese Regel ersetzt hat.
+      <strong>Herausforderung willkommen:</strong> diese Seite ist der Ort für Anpassungen, nicht
+      der Commit-Verlauf. Wirkt ein Wert in der Praxis falsch — zu eng, zu weit, falsche Ebene —
+      hier ändern und den Grund dazuschreiben.
+    </p>
+  </div>
+</section>
+
+<!-- ERSTES ELEMENT DER SEITE -->
+<section class="sg-section" id="first-element-spacing">
+  <div class="sg-section__title">Prinzip <span>Seitenanfang, Content-Elemente</span></div>
+  <div class="sg-h">Erstes Element der Seite</div>
+  <p class="sg-intro">
+    <code>main.vw-main</code> trägt bereits ein eigenes, responsives Top-Padding
+    (<code>--space-5/6/7</code> · 24/32/48px). Padding und Margin kollabieren nie über eine
+    Elterngrenze hinweg — wenn eine Komponente zusätzlich ihr eigenes Top-Spacing für den Fall
+    mitbringt, dass sie das erste Element der Seite ist, addiert sich das rein auf <code>.vw-main</code>s
+    Padding drauf, nie "das Grössere gewinnt". Norm: <strong>das erste Element verlässt sich
+    ausschliesslich auf <code>.vw-main</code></strong> und trägt selbst nichts Zusätzliches bei —
+    unabhängig davon, ob die Komponente ihr Top-Spacing sonst über <code>padding-top</code> oder
+    <code>margin-top</code> löst.
+  </p>
+
+  <div class="sg-component">
+    <div class="sg-compare">
+      <div class="sg-compare__col">
+        <span class="sg-compare__tag sg-compare__tag--wrong">Ohne Norm</span>
+        <div class="sg-stack">
+          <div class="sg-stack-box sg-stack-box--main">main.vw-main</div>
+          <div class="sg-stack-gap" style="height:32px">
+            <div class="sg-stack-gap-bar sg-stack-gap-bar--wrong"></div>
+            <span class="sg-stack-gap-label">32px</span>
+          </div>
+          <div class="sg-stack-gap" style="height:24px">
+            <div class="sg-stack-gap-bar sg-stack-gap-bar--wrong"></div>
+            <span class="sg-stack-gap-label">+24px</span>
+          </div>
+          <div class="sg-stack-box sg-stack-box--heading">Erstes Element</div>
+        </div>
+        <p class="sg-compare__sum sg-compare__sum--wrong">56px Abstand zur Navigation — mehr als auf jeder anderen Seite.</p>
+      </div>
+      <div class="sg-compare__col">
+        <span class="sg-compare__tag sg-compare__tag--right">Mit Norm</span>
+        <div class="sg-stack">
+          <div class="sg-stack-box sg-stack-box--main">main.vw-main</div>
+          <div class="sg-stack-gap" style="height:32px">
+            <div class="sg-stack-gap-bar sg-stack-gap-bar--right"></div>
+            <span class="sg-stack-gap-label">32px</span>
+          </div>
+          <div class="sg-stack-box sg-stack-box--heading">Erstes Element</div>
+        </div>
+        <p class="sg-compare__sum sg-compare__sum--right">32px — gleich, egal welche Komponente zuerst steht.</p>
+      </div>
+    </div>
+    <p class="sg-note">Werte beispielhaft für den 600px-Breakpoint (<code>.vw-main</code>s eigenes Top-Padding dort: 32px). Steht die Komponente NICHT zuerst, gilt weiterhin ihr voller eigener Wert — siehe Tabelle unten.</p>
+  </div>
+
+  <div class="sg-component">
+    <table class="sg-rhythm-table">
+      <thead><tr><th>Komponente</th><th>Mechanismus</th><th>Wert, wenn NICHT erstes Element</th></tr></thead>
+      <tbody>
+        <tr><td>.vw-hero</td><td>padding-top</td><td>--space-4/5 · 16/24px</td></tr>
+        <tr><td>.vw-page-intro (velo_lead)</td><td>padding-top</td><td>--space-4/5 · 16/24px</td></tr>
+        <tr><td>.vw-section (velo_signup/steps/positions/levels)</td><td>padding-top</td><td>--space-6/7/8 · 32/48/64px</td></tr>
+        <tr><td>.vw-parktest</td><td>margin-top</td><td>--space-6/7 · 32/48px</td></tr>
+        <tr><td>.vw-melde</td><td>padding-top</td><td>24px</td></tr>
+        <tr><td>.vw-gallery</td><td>margin-top</td><td>--space-7 · 48px</td></tr>
+        <tr><td>.content-velo-tabs</td><td>margin-top</td><td>--space-6/7 · 32/48px</td></tr>
+        <tr><td>.vw-join / .vw-newsletter / .vw-newsletter-compact</td><td>margin-top</td><td>--space-9 · 96px</td></tr>
+      </tbody>
+    </table>
+    <p class="sg-note">
+      Jede Zeile bekommt denselben Zusatz: eine Regel, die diesen Wert auf <code>0</code> setzt,
+      wenn die Komponente das erste Kind des Artikels ist. Wenn sie NICHT das erste Element ist
+      (die meisten echten Vorkommen heute), gilt der Wert aus der Tabelle unverändert weiter --
+      das ist die normale Lücke zum vorangehenden Element, nicht Teil dieser Norm.
+    </p>
+  </div>
+
+  <div class="sg-component">
+    <div class="sg-preview--white" style="padding:18px 22px;overflow-x:auto;">
+      <pre class="sg-code">/* Generisches Muster, zweimal unterschiedlich verdrahtet je nach Mechanismus:
+
+   PADDING-Fall (der Wert sitzt auf dem inneren <section>, nicht auf dem
+   Contao-Wrapper-<div> selbst -- :first-child auf dem WRAPPER zeigt mit einem
+   Nachfahren-Selektor auf die Section):
+*/
+[class*="content-velo-"]:first-child .vw-section { padding-top: 0; }
+.content-velo-hero:first-child     .vw-hero       { padding-top: 0; }
+.content-velo-lead:first-child     .vw-page-intro { padding-top: 0; }
+.content-velo-melde:first-child    .vw-melde      { padding-top: 0; }
+
+/* MARGIN-Fall (margin-top sitzt meist direkt auf derselben Klasse, die schon
+   der Contao-Wrapper ist, oder auf einer Section, die 1:1 dem Wrapper
+   entspricht -- :first-child kombiniert direkt mit der eigenen Klasse): */
+.content-velo-park-test:first-child .vw-parktest { margin-top: 0; }
+.content-velo-gallery:first-child   .vw-gallery   { margin-top: 0; }
+.content-velo-tabs:first-child                    { margin-top: 0; }
+.content-velo-join:first-child      .vw-join      { margin-top: 0; }</pre>
+    </div>
+    <p class="sg-note">
+      Umgesetzt in <code>files/themes/velo/css/site.css</code> im Contao-Projekt, jede Regel direkt
+      bei der betroffenen Komponente (nicht zentral an einer Stelle), mit Kommentar, warum genau
+      dieser Mechanismus (Padding vs. Margin) für diese Komponente gilt. Bewusst <em>keine</em>
+      einzelne globale Regel für alle Komponenten auf einmal -- <code>.vw-join</code>/
+      <code>.vw-newsletter</code> z.B. brauchen weiterhin ihre vollen 96px, wenn sie NICHT zuerst
+      stehen (häufigster Fall), eine pauschale Regel hätte das nicht unterscheiden können, ohne
+      <code>:has()</code>-Abfragen über jede Komponente zu bauen, die ihr eigenes Spacing schon
+      löst.
+    </p>
+  </div>
+
+  <div class="sg-component">
+    <p class="sg-note" style="font-style:normal;">
+      <strong>Beim Erstbau einer Komponente immer mitdenken:</strong> trägt sie ein eigenes
+      <code>padding-top</code> oder <code>margin-top</code>, das NICHT nur den Abstand zum
+      vorangehenden Element regelt, sondern auch für den Fall "ich bin das erste Element der
+      Seite" gedacht ist? Falls ja, gehört sofort eine <code>:first-child</code>-Zeile dazu, auch
+      wenn die Komponente aktuell nirgends als erstes Element vorkommt — der Fehler zeigt sich
+      sonst erst, sobald jemand die Komponenten-Reihenfolge auf einer echten Seite ändert.
     </p>
   </div>
 </section>
